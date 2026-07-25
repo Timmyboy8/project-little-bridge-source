@@ -78,6 +78,7 @@ const learningSteps = [
 const team = [
   {
     name: "Korarich Kiattanaporn",
+    nameTh: "กรฤต เกียรติธนพร",
     role: "Founder",
     detail: "Vision, device design, prototyping, and the evaluation approach.",
     school: "Triam Udom Suksa School",
@@ -85,13 +86,15 @@ const team = [
   },
   {
     name: "Kittichet Maklin",
+    nameTh: "กิตติเชษฐ์ มากลิ่น",
     role: "Co-Founder",
     detail: "Assembly, testing, outreach, promotion, and the project website.",
     school: "KPIS International School",
     image: "/team-kittichet.jpg",
   },
   {
-    name: "Yosakrit Pleum",
+    name: "Yossakrit Saengravee",
+    nameTh: "ยศกฤต แสงระวี",
     role: "Chief Engineer",
     detail: "Exterior design, enclosure development, and digital experience.",
     school: "Triam Udom Suksa School",
@@ -942,7 +945,7 @@ export default function Home() {
               </div>
               <div className="team-card-copy">
                 <p className="role">{c.team.roles[index]}</p>
-                <h3>{member.name}</h3>
+                <h3>{language === "th" ? member.nameTh : member.name}</h3>
                 <p className="team-school"><span aria-hidden="true" />{c.team.schools[index]}</p>
                 <p className="team-detail">{c.team.details[index]}</p>
               </div>
