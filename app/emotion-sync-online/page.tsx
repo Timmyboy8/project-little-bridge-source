@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type Language = "en" | "th";
 type EmotionId = "happy" | "calm" | "sad" | "frustrated";
@@ -22,11 +22,35 @@ const emotions: Array<{
 ];
 
 const situations = [
-  { image: "/everyday-scenes/tower.webp", en: "A tower you built falls down.", th: "หอคอยที่เราต่อไว้ล้มลง" },
-  { image: "/everyday-scenes/drawing.webp", en: "You finish a picture you really like.", th: "เราวาดรูปที่ตัวเองชอบเสร็จแล้ว" },
-  { image: "/everyday-scenes/breathe.webp", en: "You sit somewhere quiet and take a slow breath.", th: "เรานั่งในที่เงียบ ๆ และค่อย ๆ หายใจ" },
-  { image: "/everyday-scenes/goodbye.webp", en: "A friend goes home and you miss them.", th: "เพื่อนกลับบ้านแล้วเราคิดถึงเพื่อน" },
-];
+  { image: "/everyday-scenes/tower.webp", audioKey: "situation-tower", en: "A tower you built falls down.", th: "หอคอยที่เราต่อไว้ล้มลง" },
+  { image: "/everyday-scenes/drawing.webp", audioKey: "situation-drawing", en: "You finish a picture you really like.", th: "เราวาดรูปที่ตัวเองชอบเสร็จแล้ว" },
+  { image: "/everyday-scenes/breathe.webp", audioKey: "situation-breathe", en: "You sit somewhere quiet and take a slow breath.", th: "เรานั่งในที่เงียบ ๆ และค่อย ๆ หายใจ" },
+  { image: "/everyday-scenes/goodbye.webp", audioKey: "situation-goodbye", en: "A friend goes home and you miss them.", th: "เพื่อนกลับบ้านแล้วเราคิดถึงเพื่อน" },
+] as const;
+
+const thaiAudio = {
+  question: "/audio/th/question.mp3",
+  "face-question": "/audio/th/face-question.mp3",
+  frustrated: "/audio/th/frustrated.mp3",
+  happy: "/audio/th/happy.mp3",
+  sad: "/audio/th/sad.mp3",
+  calm: "/audio/th/calm.mp3",
+  "correct-frustrated": "/audio/th/correct-frustrated.mp3",
+  "correct-happy": "/audio/th/correct-happy.mp3",
+  "correct-sad": "/audio/th/correct-sad.mp3",
+  "correct-calm": "/audio/th/correct-calm.mp3",
+  retry: "/audio/th/retry.mp3",
+  "learn-frustrated": "/audio/th/learn-frustrated.mp3",
+  "learn-happy": "/audio/th/learn-happy.mp3",
+  "learn-sad": "/audio/th/learn-sad.mp3",
+  "learn-calm": "/audio/th/learn-calm.mp3",
+  "situation-tower": "/audio/th/situation-tower.mp3",
+  "situation-drawing": "/audio/th/situation-drawing.mp3",
+  "situation-breathe": "/audio/th/situation-breathe.mp3",
+  "situation-goodbye": "/audio/th/situation-goodbye.mp3",
+} as const;
+
+type ThaiAudioKey = keyof typeof thaiAudio;
 
 const faceQuiz = [
   { emotion: "happy" as EmotionId, image: "/emotion-faces/q2-happy.webp" },
@@ -142,7 +166,7 @@ const copy = {
     reflection: "ความรู้สึกแบบนี้เกิดขึ้นได้",
     reflectionText: "แต่ละคนอาจรู้สึกไม่เหมือนกันในสถานการณ์เดียวกัน สิ่งสำคัญคือการสังเกตและบอกความรู้สึกของตัวเอง",
     another: "สถานการณ์ถัดไป",
-    audioUnavailable: "อุปกรณ์นี้ยังไม่มีเสียงภาษาไทยที่รองรับ",
+    audioUnavailable: "ไม่สามารถเล่นเสียงได้ กรุณาลองอีกครั้ง",
   },
 } as const;
 
@@ -170,6 +194,7 @@ export default function EmotionSyncOnlinePage() {
   const [listenEmotion, setListenEmotion] = useState<EmotionId | null>(null);
   const [listenAnswer, setListenAnswer] = useState<EmotionId | null>(null);
   const [audioError, setAudioError] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const c = copy[language];
   const activeEmotion = useMemo(() => emotions.find((emotion) => emotion.id === prompt) ?? null, [prompt]);
@@ -190,8 +215,32 @@ export default function EmotionSyncOnlinePage() {
     window.localStorage.setItem("plb-language", language);
   }, [language]);
 
-  const speak = (text: string) => {
+  const stopAudio = () => {
+    audioRef.current?.pause();
+    audioRef.current = null;
+    window.speechSynthesis?.cancel();
+  };
+
+  const speak = (text: string, thaiAudioKey?: ThaiAudioKey) => {
     setAudioError(false);
+    stopAudio();
+
+    if (language === "th") {
+      if (!thaiAudioKey) {
+        setAudioError(true);
+        return;
+      }
+      const audio = new Audio(thaiAudio[thaiAudioKey]);
+      audio.preload = "auto";
+      audio.onerror = () => setAudioError(true);
+      audio.onended = () => {
+        if (audioRef.current === audio) audioRef.current = null;
+      };
+      audioRef.current = audio;
+      void audio.play().catch(() => setAudioError(true));
+      return;
+    }
+
     if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") {
       setAudioError(true);
       return;
@@ -204,8 +253,8 @@ export default function EmotionSyncOnlinePage() {
       didSpeak = true;
       try {
         const utterance = new SpeechSynthesisUtterance(text);
-        const target = language === "th" ? "th-TH" : "en-US";
-        const prefix = language === "th" ? "th" : "en";
+        const target = "en-US";
+        const prefix = "en";
         const voices = synth.getVoices();
         const matchingVoices = voices.filter((item) => item.lang.toLowerCase() === target.toLowerCase())
           .concat(voices.filter((item) => item.lang.toLowerCase().startsWith(prefix) && item.lang.toLowerCase() !== target.toLowerCase()));
@@ -214,13 +263,9 @@ export default function EmotionSyncOnlinePage() {
           const score = (item: SpeechSynthesisVoice) => qualityWords.reduce((total, word) => total + (item.name.toLowerCase().includes(word) ? 1 : 0), 0);
           return score(b) - score(a);
         })[0];
-        if (language === "th" && !voice) {
-          setAudioError(true);
-          return;
-        }
         utterance.lang = voice?.lang ?? target;
         if (voice) utterance.voice = voice;
-        utterance.rate = language === "th" ? 0.92 : 0.96;
+        utterance.rate = 0.96;
         utterance.pitch = 1.02;
         utterance.onerror = () => setAudioError(true);
         synth.cancel();
@@ -257,7 +302,7 @@ export default function EmotionSyncOnlinePage() {
     setEverydayAnswer(null);
     setFaceAnswer(null);
     setListenAnswer(null);
-    window.speechSynthesis?.cancel();
+    stopAudio();
   };
 
   const playListenEmotion = (next = false) => {
@@ -268,7 +313,7 @@ export default function EmotionSyncOnlinePage() {
       setListenAnswer(null);
     }
     const emotion = emotions.find((item) => item.id === id);
-    if (emotion) speak(spokenEmotionName(emotion, language));
+    if (emotion) speak(spokenEmotionName(emotion, language), emotion.id);
   };
 
   const answerFaceQuestion = (emotion: EmotionId) => {
@@ -335,7 +380,7 @@ export default function EmotionSyncOnlinePage() {
               <span className="online-mode-number">01</span>
               <h2>{c.practiceTitle}</h2>
               <p>{c.practiceText}</p>
-              <button className="online-voice-link" type="button" onClick={() => speak(c.speakQuestion)}>
+              <button className="online-voice-link" type="button" onClick={() => speak(c.speakQuestion, "question")}>
                 <span aria-hidden="true">◖))</span> {c.voicePrompt}
               </button>
               {audioError && <small className="online-audio-error" role="status">{c.audioUnavailable}</small>}
@@ -383,9 +428,9 @@ export default function EmotionSyncOnlinePage() {
                         onClick={() => {
                           setAnswer(emotion.id);
                           if (emotion.id === prompt) {
-                            speak(language === "th" ? `ถูกต้อง ${spokenEmotionName(emotion, language)}` : `Correct. ${emotion.en}.`);
+                            speak(language === "th" ? `ถูกต้อง ${spokenEmotionName(emotion, language)}` : `Correct. ${emotion.en}.`, `correct-${emotion.id}` as ThaiAudioKey);
                           } else {
-                            speak(language === "th" ? "ลองดูอีกครั้ง" : "Take another look.");
+                            speak(language === "th" ? "ลองดูอีกครั้ง" : "Take another look.", "retry");
                           }
                         }}
                       ><span className="sr-only">{language === "th" ? emotion.th : emotion.en}</span></button>
@@ -432,7 +477,7 @@ export default function EmotionSyncOnlinePage() {
                 <div className="online-face-question">
                   <div className="online-question-row">
                     <p>{c.faceQuestion}</p>
-                    <button className="online-question-audio" type="button" aria-label={c.voicePrompt} onClick={() => speak(c.faceQuestion)}>◖))</button>
+                    <button className="online-question-audio" type="button" aria-label={c.voicePrompt} onClick={() => speak(c.faceQuestion, "face-question")}>◖))</button>
                   </div>
                   <div className="online-answer-grid" role="group" aria-label={c.faceQuestion}>
                     {emotions.map((emotion) => (
@@ -523,7 +568,7 @@ export default function EmotionSyncOnlinePage() {
                     <span className="online-face" aria-hidden="true">{emotion.face}</span>
                     <h3>{name}</h3>
                     <p>{description}</p>
-                    <button type="button" onClick={() => speak(`${spokenEmotionName(emotion, language)}. ${description}`)}>
+                    <button type="button" onClick={() => speak(`${spokenEmotionName(emotion, language)}. ${description}`, `learn-${emotion.id}` as ThaiAudioKey)}>
                       <span aria-hidden="true">◖))</span> {c.hear}
                     </button>
                   </article>
@@ -549,7 +594,7 @@ export default function EmotionSyncOnlinePage() {
               <div className="online-situation-copy">
                 <h3>{c.mightFeel}</h3>
                 <p className="online-situation-prompt">{language === "th" ? situation.th : situation.en}</p>
-                <button className="online-voice-link online-situation-audio" type="button" onClick={() => speak(`${language === "th" ? situation.th : situation.en}. ${c.mightFeel}`)}>
+                <button className="online-voice-link online-situation-audio" type="button" onClick={() => speak(`${language === "th" ? situation.th : situation.en}. ${c.mightFeel}`, situation.audioKey)}>
                   <span aria-hidden="true">◖))</span> {c.hearSituation}
                 </button>
                 <div className="online-feeling-choices">

@@ -447,9 +447,14 @@ export default function Home() {
           <p className="hero-kicker"><span aria-hidden="true" />Project Little Bridge<span aria-hidden="true" /></p>
           <h1 className="hero-product-title">Emotion Sync<span className="title-spark" aria-hidden="true">✦</span></h1>
           <p className="hero-summary">{c.hero.summary}</p>
-          <a className="button button-yellow hero-cta" href="/emotion-sync-online">
-            {c.cta.practiceButton} <IconArrow />
-          </a>
+          <div className="hero-actions" aria-label={language === "th" ? "การทำงานหลัก" : "Primary actions"}>
+            <a className="button button-yellow hero-cta hero-online-cta" href="/emotion-sync-online">
+              {c.cta.practiceButton} <IconArrow />
+            </a>
+            <a className="button button-blue hero-cta" href="#how-it-works">
+              {c.hero.cta} <IconArrow />
+            </a>
+          </div>
         </div>
 
         <div className="hero-stage">
@@ -525,9 +530,6 @@ export default function Home() {
               </div>
             </div>
             <p className="device-hint"><span aria-hidden="true">↗</span> {c.hero.hint}</p>
-            <a className="button button-blue hero-cta" href="#how-it-works">
-              {c.hero.cta} <IconArrow />
-            </a>
             {(selectedEmotion || syncComplete) && (
               <div className="hero-feedback is-active" key={selectedEmotion}>
                 <div className="feedback-copy" role="status" aria-live="polite">
