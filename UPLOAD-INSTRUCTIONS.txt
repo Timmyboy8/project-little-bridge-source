@@ -1,0 +1,12 @@
+PROJECT LITTLE BRIDGE — NETLIFY DEPLOYMENT FIX
+
+1. Open the extracted folder containing this file.
+2. Upload all files and folders in this folder to the root of the GitHub repository.
+3. Commit directly to the main branch.
+4. Wait for Netlify's automatic deployment.
+
+This package uses "next build" and publishes the generated "out" folder.
+It does not require scripts/build-verified.sh.
+
+Firebase security rules are unchanged from the Organized Reports version.
+Only publish firestore.rules again if you did not publish that version previously.

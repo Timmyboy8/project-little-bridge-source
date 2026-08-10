@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, DM_Sans, Noto_Sans_Thai } from "next/font/google";
 import "./globals.css";
+import VisitCounter from "./VisitCounter";
 
 const displayFont = Bricolage_Grotesque({
   variable: "--font-display",
@@ -36,6 +37,7 @@ export default function RootLayout({
       <body
         className={`${displayFont.variable} ${bodyFont.variable} ${thaiFont.variable} antialiased`}
       >
+        <VisitCounter />
         {children}
       </body>
     </html>
