@@ -1,0 +1,54 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function ownsUserSpace(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    match /publicMetrics/siteVisits {
+      allow read: if false;
+      allow create: if request.resource.data.keys().hasOnly(['count', 'updatedAt'])
+        && request.resource.data.count is int
+        && request.resource.data.count == 1
+        && request.resource.data.updatedAt is string;
+      allow update: if request.resource.data.keys().hasOnly(['count', 'updatedAt'])
+        && request.resource.data.count is int
+        && resource.data.count is int
+        && request.resource.data.count == resource.data.count + 1
+        && request.resource.data.updatedAt is string;
+      allow delete: if false;
+    }
+
+    match /users/{userId}/children/{childId} {
+      allow read, delete: if ownsUserSpace(userId);
+      allow create, update: if ownsUserSpace(userId)
+        && request.resource.data.keys().hasOnly(['nickname', 'createdAt'])
+        && request.resource.data.nickname is string
+        && request.resource.data.nickname.size() > 0
+        && request.resource.data.nickname.size() <= 40
+        && request.resource.data.createdAt is string;
+
+      match /events/{eventId} {
+        allow read, delete: if ownsUserSpace(userId);
+        allow create, update: if ownsUserSpace(userId)
+          && request.resource.data.keys().hasOnly(['kind', 'completedAt', 'payload'])
+          && request.resource.data.kind in ['guided', 'check', 'everyday', 'learn', 'device']
+          && request.resource.data.completedAt is string
+          && request.resource.data.completedAt.size() <= 40
+          && request.resource.data.payload is map
+          && request.resource.data.payload.keys().hasOnly([
+            'id', 'completedAt', 'kind', 'activity', 'records', 'durationMs',
+            'everyday', 'learnedEmotion', 'deviceRound'
+          ])
+          && request.resource.data.payload.id is string
+          && request.resource.data.payload.id.size() > 0
+          && request.resource.data.payload.id.size() <= 100
+          && request.resource.data.payload.completedAt == request.resource.data.completedAt
+          && request.resource.data.payload.kind == request.resource.data.kind
+          && request.resource.data.payload.records is list
+          && request.resource.data.payload.records.size() <= 32;
+      }
+    }
+  }
+}
