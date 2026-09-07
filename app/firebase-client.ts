@@ -26,8 +26,10 @@ import {
   orderBy,
   query,
   setDoc,
+  serverTimestamp,
   writeBatch,
 } from "firebase/firestore";
+import { browserNeedsRegistration, getOrCreateBrowserId, markBrowserRegistered } from "./browser-identity";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyC0fyoNT2tdTPELqoW0_IUp4rQ9jbndujc",
@@ -145,6 +147,22 @@ export async function incrementSiteVisit() {
     count: increment(1),
     updatedAt: new Date().toISOString(),
   }, { merge: true });
+}
+
+export async function registerUniqueBrowser() {
+  if (!firebaseConfigured) return;
+  const id = getOrCreateBrowserId();
+  if (!browserNeedsRegistration(id)) return;
+  const { db } = services();
+  const batch = writeBatch(db);
+  // Rules require both writes together and reject a UUID already registered.
+  // Concurrent tabs can therefore add only one to the unique-browser total.
+  batch.set(doc(db, "browserVisitors", id), { firstSeenAt: serverTimestamp() });
+  batch.set(doc(db, "publicMetrics", "uniqueBrowsers"), {
+    count: increment(1), lastBrowserId: id, updatedAt: serverTimestamp(),
+  }, { merge: true });
+  await batch.commit();
+  markBrowserRegistered(id);
 }
 
 export async function loadChildProfiles(uid: string): Promise<FirebaseChildProfile[]> {

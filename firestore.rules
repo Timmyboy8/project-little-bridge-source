@@ -20,6 +20,36 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    function newBrowserRegistration(browserId) {
+      return browserId is string
+        && browserId.matches('^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$')
+        && !exists(/databases/$(database)/documents/browserVisitors/$(browserId))
+        && getAfter(/databases/$(database)/documents/browserVisitors/$(browserId)).data.firstSeenAt == request.time;
+    }
+
+    match /publicMetrics/uniqueBrowsers {
+      allow read, delete: if false;
+      allow create: if request.resource.data.keys().hasOnly(['count', 'lastBrowserId', 'updatedAt'])
+        && request.resource.data.count is int && request.resource.data.count == 1
+        && request.resource.data.updatedAt == request.time
+        && newBrowserRegistration(request.resource.data.lastBrowserId);
+      allow update: if request.resource.data.keys().hasOnly(['count', 'lastBrowserId', 'updatedAt'])
+        && request.resource.data.count is int
+        && request.resource.data.count == resource.data.count + 1
+        && request.resource.data.updatedAt == request.time
+        && newBrowserRegistration(request.resource.data.lastBrowserId);
+    }
+
+    match /browserVisitors/{browserId} {
+      allow read, update, delete: if false;
+      allow create: if newBrowserRegistration(browserId)
+        && request.resource.data.keys().hasOnly(['firstSeenAt'])
+        && getAfter(/databases/$(database)/documents/publicMetrics/uniqueBrowsers).data.lastBrowserId == browserId
+        && getAfter(/databases/$(database)/documents/publicMetrics/uniqueBrowsers).data.count ==
+          (exists(/databases/$(database)/documents/publicMetrics/uniqueBrowsers)
+            ? get(/databases/$(database)/documents/publicMetrics/uniqueBrowsers).data.count + 1 : 1);
+    }
+
     match /users/{userId}/children/{childId} {
       allow read, delete: if ownsUserSpace(userId);
       allow create, update: if ownsUserSpace(userId)

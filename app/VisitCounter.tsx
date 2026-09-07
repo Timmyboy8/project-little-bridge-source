@@ -1,12 +1,18 @@
 "use client";
 
 import { useEffect } from "react";
-import { incrementSiteVisit } from "./firebase-client";
+import { incrementSiteVisit, registerUniqueBrowser } from "./firebase-client";
+
+let countedThisLoad = false;
 
 export default function VisitCounter() {
   useEffect(() => {
-    void incrementSiteVisit().catch(() => {
-      // Traffic counting must never interrupt the visitor's experience.
+    // Survives React effect replays and client navigation, resets on a full load.
+    if (countedThisLoad) return;
+    countedThisLoad = true;
+    void incrementSiteVisit().catch(() => {});
+    void registerUniqueBrowser().catch(() => {
+      // Never block activities. A failed registration is retried next load.
     });
   }, []);
 

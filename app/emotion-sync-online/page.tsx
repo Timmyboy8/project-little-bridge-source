@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
+import { getOrCreateBrowserId } from "../browser-identity";
 import {
   createAdultWithEmail,
   createFirebaseChild,
@@ -426,11 +427,9 @@ function exportFilename(nickname: string, language: ExportLanguage) {
 }
 
 const guestStorageKey = "emotion-sync-guest-progress-v1";
-const guestProfile: ChildProfile = {
-  id: "browser-guest",
-  nickname: "Guest",
-  createdAt: "browser-only",
-};
+function getGuestProfile(): ChildProfile {
+  return { id: getOrCreateBrowserId(), nickname: "Guest", createdAt: "browser-only" };
+}
 
 function readGuestHistory(): SavedSession[] | null {
   try {
@@ -446,7 +445,7 @@ function readGuestHistory(): SavedSession[] | null {
 function writeGuestHistory(history: SavedSession[]) {
   window.localStorage.setItem(guestStorageKey, JSON.stringify({
     version: 1,
-    profile: guestProfile,
+    profile: getGuestProfile(),
     history,
     updatedAt: new Date().toISOString(),
   }));
@@ -571,9 +570,18 @@ export default function EmotionSyncOnlinePage() {
       queueMicrotask(() => setAuthState("unconfigured"));
       return;
     }
+    let accountRequest = 0;
+    let disposed = false;
     const unsubscribe = observeAdultAccount((adult) => {
+      const request = ++accountRequest;
+      setProfiles([]);
+      setActiveChildId("");
+      setHistory([]);
+      setSaveState("idle");
+      setProfileMenuOpen(false);
       if (!adult) {
         const guestHistory = readGuestHistory();
+        const guestProfile = getGuestProfile();
         setAuthState("anonymous");
         setAdultId("");
         setAdultName("");
@@ -591,16 +599,17 @@ export default function EmotionSyncOnlinePage() {
       setAdultName(adult.displayName);
       setCloudError(false);
       void loadChildProfiles(adult.uid).then((nextProfiles) => {
+        if (disposed || request !== accountRequest) return;
         setProfiles(nextProfiles);
         setActiveChildId(nextProfiles[0]?.id || "");
         setLearnedThisVisit([]);
         setProfileComposerOpen(nextProfiles.length === 0);
-      }).catch(() => setCloudError(true));
+      }).catch(() => { if (!disposed && request === accountRequest) setCloudError(true); });
     }, () => {
       setAuthState("anonymous");
       setCloudError(true);
     });
-    return unsubscribe;
+    return () => { disposed = true; unsubscribe(); };
   }, []);
 
   useEffect(() => {
@@ -730,14 +739,14 @@ export default function EmotionSyncOnlinePage() {
   };
 
   const recordActivity = (saved: SavedSession) => {
-    if (guestMode && activeChildId === guestProfile.id) {
-      setHistory((current) => {
-        const next = [saved, ...current.filter((event) => event.id !== saved.id)];
+    if (guestMode && activeChildId) {
+      const next = [saved, ...history.filter((event) => event.id !== saved.id)];
+      setHistory(next);
+      try {
         writeGuestHistory(next);
-        return next;
-      });
+        setSaveState("saved");
+      } catch { setSaveState("error"); }
       setCloudError(false);
-      setSaveState("saved");
       return;
     }
     if (!adultId || !activeChildId || authState !== "authenticated") {
@@ -889,12 +898,14 @@ export default function EmotionSyncOnlinePage() {
 
   const startGuestMode = () => {
     const storedHistory = readGuestHistory() || [];
-    writeGuestHistory(storedHistory);
+    const guestProfile = getGuestProfile();
+    let saved = true;
+    try { writeGuestHistory(storedHistory); } catch { saved = false; }
     setGuestMode(true);
     setProfiles([guestProfile]);
     setActiveChildId(guestProfile.id);
     setHistory(storedHistory);
-    setSaveState(storedHistory.length ? "saved" : "idle");
+    setSaveState(saved ? (storedHistory.length ? "saved" : "idle") : "error");
     setCloudError(false);
   };
 
@@ -1381,7 +1392,7 @@ export default function EmotionSyncOnlinePage() {
           <button className="v2-back-button" type="button" onClick={openHome}>← {c.backHome}</button>
           <p className="eyebrow">{c.progress}</p><h2>{c.report}</h2><p className="v2-results-intro">{c.reportIntro}</p>
           {renderAccountHub(true)}
-          {activeProfile && <div className={`v2-save-status${guestMode ? " is-local" : " is-cloud"}${saveState === "error" ? " is-error" : ""}`} role="status"><span aria-hidden="true">●</span><div><strong>{guestMode ? `${c.guestLocal} · ${c.guestName}` : saveState === "saving" ? c.savingActivity : saveState === "error" ? c.saveFailed : `${c.saveStatus} · ${activeProfile.nickname}`}</strong><p>{c.reportNotice}</p></div></div>}
+          {activeProfile && <div className={`v2-save-status${guestMode ? " is-local" : " is-cloud"}${saveState === "error" ? " is-error" : ""}`} role="status"><span aria-hidden="true">●</span><div><strong>{guestMode ? (saveState === "error" ? (language === "th" ? "บันทึกในเบราว์เซอร์ไม่สำเร็จ กรุณาดาวน์โหลด CSV เพื่อเก็บข้อมูล" : "Could not save in this browser. Download CSV to keep this progress.") : `${c.guestLocal} · ${c.guestName}`) : saveState === "saving" ? c.savingActivity : saveState === "error" ? c.saveFailed : `${c.saveStatus} · ${activeProfile.nickname}`}</strong><p>{c.reportNotice}</p></div></div>}
           {activeProfile && (
             <section className="v2-export-panel" aria-labelledby="progress-export-title">
               <span className="v2-export-icon" aria-hidden="true">↓</span>

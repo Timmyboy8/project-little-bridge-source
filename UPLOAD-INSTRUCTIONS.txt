@@ -1,12 +1,45 @@
-PROJECT LITTLE BRIDGE — NETLIFY DEPLOYMENT FIX
+PROJECT LITTLE BRIDGE — SEPTEMBER 2026 UPDATE
 
-1. Open the extracted folder containing this file.
-2. Upload all files and folders in this folder to the root of the GitHub repository.
-3. Commit directly to the main branch.
-4. Wait for Netlify's automatic deployment.
+This ZIP contains the complete website source for GitHub and Netlify.
 
-This package uses "next build" and publishes the generated "out" folder.
-It does not require scripts/build-verified.sh.
+1. Extract this ZIP.
+2. Open Firebase Console > your Project Little Bridge project > Firestore Database > Rules.
+   Replace the editor contents with the included firestore.rules, then click Publish.
+   This is required for the new unique-browser counter. Uploading to GitHub does not publish rules.
+3. In GitHub Desktop, open your existing project-little-bridge-source repository.
+   Fetch origin / pull first if Desktop offers it.
+4. Choose Show in Explorer (Windows) or Show in Finder (Mac).
+5. Copy ALL CONTENTS of the extracted folder into that repository folder.
+   Replace matching files. package.json, app, public and netlify.toml belong directly in the repository root.
+   Keep the repository's .git folder. Do not copy node_modules, .next, out or the ZIP itself.
+6. Return to GitHub Desktop. Review the changes, commit to main, then Push origin.
+7. In Netlify > Deploys, wait for Published. Then open projectlittlebridge.org and refresh.
 
-Firebase security rules are unchanged from the Organized Reports version.
-Only publish firestore.rules again if you did not publish that version previously.
+Use GitHub Desktop for the public folder: GitHub's browser uploader has a file-count limit.
+The build command remains npm run build (next build), and Netlify publishes out.
+No scripts/build-verified.sh is required.
+
+CHECK VISITOR NUMBERS
+Firebase Console > Firestore Database > Data > publicMetrics:
+- siteVisits > count: total full website loads, including refreshes.
+- uniqueBrowsers > count: browser UUIDs registered since this update was deployed.
+
+These are estimated unique BROWSERS, not verified people or guest-only users.
+The same browser is counted once even if its visitor signs in later.
+Another browser/device, private browsing or clearing site data can count again.
+Older visits cannot be reconstructed into unique visitors.
+Blocked storage or blocked Firebase requests may prevent counting. Automated traffic can inflate it.
+The browserVisitors collection stores random IDs and first registration times only.
+Child names, activity answers and account IDs are not sent to the visitor counter.
+
+PROFILES AND PROGRESS
+Signed in: Manage profile > Add another child. Each child has separate saved history in the same account.
+Guest: progress stays in this browser and survives reloads. Existing guest history remains compatible.
+Deleting guest progress leaves the separate visitor ID in place to avoid double-counting.
+Signing in does not automatically upload guest history.
+
+AFTER DEPLOYMENT
+- Check the Autistic Thai Foundation photos and English/Thai copy on the homepage.
+- Complete a guest activity, reload and check its progress history.
+- Create/switch between two account profiles and confirm their results stay separate.
+- Open the site twice in one browser: siteVisits increases twice; uniqueBrowsers only once.

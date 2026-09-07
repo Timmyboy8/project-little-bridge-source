@@ -2,6 +2,8 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import thailandMap from "@svg-maps/thailand";
+import DonationDirectory from "./DonationDirectory";
+import { donations } from "./donations";
 
 const IconArrow = () => (
   <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -142,14 +144,6 @@ const prototypeButtons: Array<{ emotion: EmotionChoice; color: string }> = [
 
 const quizSequence: EmotionChoice[] = ["happy", "sad", "frustrated", "calm"];
 
-const bangkokDonation = {
-  province: "Bangkok",
-  places: {
-    en: ["The Foundation of the Welfare of the Mentally Retarded of Thailand Under the Royal Patronage of H.M.The Queen"],
-    th: ["มูลนิธิช่วยคนปัญญาอ่อนแห่งประเทศไทย ในพระบรมราชินูปถัมภ์"],
-  },
-};
-
 type Language = "en" | "th";
 type ContactStatus = "idle" | "submitting" | "success" | "error";
 
@@ -208,12 +202,12 @@ const siteCopy = {
       architecture: "Prototype architecture", anywhere: "Built to work anywhere", offline: "Offline-first", map: "Emotion Sync · System map", controller: "Controller", runs: "Runs each session", prompt: "Emotion prompt", buttons: "4 buttons", childAnswer: "Child’s answer", led: "LED feedback", rightRetry: "Right or retry", localSync: "Local sync", progressLater: "Progress for later", privacy: "Privacy-minded by design", privacyText: "Core gameplay works offline. Progress stays local until it is intentionally transferred.",
     },
     prototype: { eyebrow: "", titleA: "The Prototype We Built", titleB: "", lede: "The interactive model mirrors the working prototype our student team built and refined by hand.", facts: ["Tactile emotion responses", "Emoji face on the OLED", "Assembled by our team", "Made to test and improve"], hand: "Hand-built", iterative: "Iterative", link: "Follow the build journey" },
-    progress: { eyebrow: "", titleA: "Our Progress So Far", titleB: "", lede: "Follow the journey from our first sketch to our first community donation.", current: "Current stage", donating: "Now donating", distribution: "Community distribution", completed: "Completed", here: "We are here", steps: [{ title: "Device design", text: "Shaping the idea into a friendly device." }, { title: "Working prototype", text: "Building the controls and core experience." }, { title: "Testing & refinement", text: "Improving through trials and feedback." }, { title: "Community distribution", text: "Bringing our first device to a Bangkok community partner." }] },
-    reach: { eyebrow: "Where we donate", titleA: "A little bridge", titleB: "across Thailand.", lede: "Explore the map to see where an Emotion Sync donation is underway.", stat: "donation in progress", bangkok: "Bangkok", province: "Donation province", recipient: "Recipient organization", recipientPending: "Recipient names will appear here once confirmed.", prompt: "Hover to preview. Click or tap Bangkok to open it, then click again to close.", mapTitle: "Thailand donation map", inProgress: "In progress", caption: "Bangkok is our first active donation province. More bridges will appear as the project grows.", show: "Bangkok. Show donation locations.", hide: "Bangkok. Hide donation locations." },
+    progress: { eyebrow: "", titleA: "Our Progress So Far", titleB: "", lede: "From our first sketch to sharing Emotion Sync with communities in Bangkok.", current: "Current stage", donating: "Now donating", distribution: "Community distribution", completed: "Completed", here: "We are here", steps: [{ title: "Device design", text: "Shaping the idea into a friendly device." }, { title: "Working prototype", text: "Building the controls and core experience." }, { title: "Testing & refinement", text: "Improving through trials and feedback." }, { title: "Community distribution", text: "Donating devices and learning from two foundations in Bangkok." }] },
+    reach: { eyebrow: "Where we donate", titleA: "A little bridge", titleB: "across Thailand.", lede: "Explore the map to see the two foundations where we have donated Emotion Sync.", stat: "recipient organizations", bangkok: "Bangkok", province: "Donation province", recipient: "Recipient organization", recipientPending: "Recipient names will appear here once confirmed.", prompt: "Hover to preview. Click or tap Bangkok to open it, then click again to close.", mapTitle: "Thailand donation map", inProgress: "Devices donated", caption: "We have donated Emotion Sync to two foundations in Bangkok and are using their feedback to improve it.", show: "Bangkok. Show donation locations.", hide: "Bangkok. Hide donation locations." },
     team: { eyebrow: "", titleA: "Meet Our Team", titleB: "", lede: "Students from two Bangkok schools combining engineering, design, and outreach.", roles: ["Founder", "Co-Founder", "Engineer"], schools: ["Triam Udom Suksa School", "KPIS International School", "Triam Udom Suksa School"], details: ["Vision, device design, prototyping, and evaluation.", "Assembly, testing, outreach, promotion, and the website.", "Exterior design, enclosure development, and digital experience."] },
     cta: { eyebrow: "", titleA: "Get Involved", titleB: "", text: "Educators, caregivers, partners, and supporters can help us test, improve, and share Emotion Sync.", conversation: "Start a conversation", follow: "Follow our journey", subject: "Conversation with Project Little Bridge", body: "Hello Project Little Bridge team,\n\nI would like to learn more about the project.\n\nMy message:\n", practiceEyebrow: "Free online practice", practiceTitle: "Practice emotions online", practiceText: "Start as a guest with progress saved in this browser, or create a free adult account to keep it available across devices—without timers or score pressure.", practiceButton: "Practice Online", formTitle: "Send us a message", formIntro: "Choose a reason and tell us how we can help.", name: "Name", email: "Email", organisation: "School or organization (optional)", reason: "I am interested in", message: "Message", messagePlaceholder: "Tell us a little about how you would like to help", submit: "Send message", sending: "Sending…", success: "Thanks—your message has been sent. We’ll get back to you soon.", error: "We couldn’t send your message. Please try again in a moment.", formNote: "Your message will be sent directly to the Project Little Bridge team.", reasons: ["Partner with us", "Support production", "Invite our team", "General question"] },
     footer: { text: "Building understanding, one small connection at a time.", follow: "Follow Project Little Bridge", instagram: "Follow Project Little Bridge on Instagram", facebook: "Follow Project Little Bridge on Facebook", privacy: "Privacy", top: "Back to top ↑" },
-    a11y: { home: "Project Little Bridge home", primaryNav: "Primary navigation", mobileNav: "Mobile navigation", sessionSteps: "Session demonstration steps", resultNone: "No answer selected yet", resultCorrect: "Green light: correct answer", resultWrong: "Yellow light: incorrect answer", principles: "Project Little Bridge principles", components: "Emotion Sync component system", prototypeMain: "A student holding the first Emotion Sync prototype, showing its OLED screen and four colored response buttons", prototypeControls: "Close-up view of the handmade Emotion Sync controls and enclosure", prototypeLabel: "Rear view of the prototype showing its Project Little Bridge label", prototypeFeatures: "Prototype features", progressCurrent: "Current stage: community distribution, now donating", reachStat: "One province with a donation in progress", mapAlt: "Map of Thailand with Bangkok highlighted as a current donation province", portrait: "Portrait of", mapData: "Map data" },
+    a11y: { home: "Project Little Bridge home", primaryNav: "Primary navigation", mobileNav: "Mobile navigation", sessionSteps: "Session demonstration steps", resultNone: "No answer selected yet", resultCorrect: "Green light: correct answer", resultWrong: "Yellow light: incorrect answer", principles: "Project Little Bridge principles", components: "Emotion Sync component system", prototypeMain: "A student holding the first Emotion Sync prototype, showing its OLED screen and four colored response buttons", prototypeControls: "Close-up view of the handmade Emotion Sync controls and enclosure", prototypeLabel: "Rear view of the prototype showing its Project Little Bridge label", prototypeFeatures: "Prototype features", progressCurrent: "Current stage: community distribution, now donating", reachStat: "Two recipient organizations in Bangkok", mapAlt: "Map of Thailand with Bangkok highlighted as a current donation province", portrait: "Portrait of", mapData: "Map data" },
   },
   th: {
     nav: { story: "เรื่องราวของเรา", product: "Emotion Sync", helps: "วิธีใช้งาน", reach: "พื้นที่ที่เราส่งมอบอุปกรณ์", team: "ทีมของเรา", menu: "เมนู", closeMenu: "ปิดเมนู" },
@@ -235,17 +229,18 @@ const siteCopy = {
     story: { origin: "สร้างโดยนักเรียนในกรุงเทพฯ", quote: "เราอยากช่วยให้เด็กเข้าใจและบอกความรู้สึกได้ง่ายขึ้น", rhythm: ["รับฟัง", "สร้าง", "แบ่งปัน"], feel: "ฉันรู้สึก", calm: "สงบ", proud: "ภูมิใจ", eyebrow: "", title: "เหตุผลที่เราสร้าง Emotion Sync", p1: "เราเริ่ม Project Little Bridge เพราะอยากทำให้การฝึกเรื่องอารมณ์เข้าใจง่ายและเป็นมิตรกับเด็ก จึงพัฒนาอุปกรณ์ที่เด็กสามารถดู กดตอบ และฝึกซ้ำได้ตามความพร้อม", p2: "อุปกรณ์นี้ไม่ได้มาแทนครู ผู้ปกครอง หรือผู้ดูแล แต่ช่วยให้เริ่มพูดคุยเรื่องอารมณ์กับเด็กได้ง่ายขึ้น", student: "นักเรียนเป็นผู้ลงมือทำ", studentText: "ทีมของเราออกแบบและสร้างอุปกรณ์ด้วยตัวเอง", human: "สร้างเพื่อเด็กและผู้ดูแล", humanText: "ใช้เทคโนโลยีช่วยให้เด็กกับผู้ดูแลเข้าใจกันมากขึ้น", link: "รู้จักทีมผู้สร้าง" },
     product: { eyebrow: "", titleA: "ภายใน Emotion Sync", titleB: "", lede: "Emotion Sync รวมหน้าจอ ปุ่มกด ไฟบอกผล และการบันทึกข้อมูลไว้ในอุปกรณ์เดียว", features: [{ tag: "หน้าจอ", title: "ดูหน้าอีโมจิ", text: "จอ OLED แสดงหน้าอีโมจิ 1 หน้าให้เด็กทายอารมณ์" }, { tag: "ปุ่มกด", title: "เลือกคำตอบ", text: "เด็กกดปุ่มสี 1 ใน 4 ปุ่มเพื่อเลือกคำตอบ" }, { tag: "บันทึก", title: "บันทึกผลการเล่น", text: "ปุ่มสีขาวใช้บันทึกผลไว้สำหรับดาวน์โหลดในภายหลัง" }], architecture: "โครงสร้างต้นแบบ", anywhere: "ใช้งานได้โดยไม่ต้องต่ออินเทอร์เน็ต", offline: "ทำงานออฟไลน์", map: "Emotion Sync · แผนผังระบบ", controller: "ตัวควบคุม", runs: "ควบคุมการทำงานของอุปกรณ์", prompt: "แสดงอารมณ์", buttons: "4 ปุ่ม", childAnswer: "คำตอบของเด็ก", led: "ไฟบอกผล", rightRetry: "ตอบถูก / ลองอีกครั้ง", localSync: "บันทึกในเครื่อง", progressLater: "บันทึกผลการเล่น", privacy: "คำนึงถึงความเป็นส่วนตัว", privacyText: "อุปกรณ์ใช้งานได้โดยไม่ต้องต่ออินเทอร์เน็ต ข้อมูลจะเก็บอยู่ในเครื่องและส่งออกเมื่อผู้ใช้เลือกเท่านั้น" },
     prototype: { eyebrow: "", titleA: "ต้นแบบที่เราสร้าง", titleB: "", lede: "แบบจำลองด้านบนสร้างจากต้นแบบจริงที่ทีมของเราประกอบและปรับปรุงด้วยตัวเอง", facts: ["ปุ่มเลือกคำตอบ 4 ปุ่ม", "หน้าอีโมจิบนจอ OLED", "ประกอบโดยทีมของเรา", "นำผลทดสอบมาพัฒนาต่อ"], hand: "สร้างด้วยมือ", iterative: "ปรับปรุงจากการทดสอบ", link: "ดูขั้นตอนการพัฒนา" },
-    progress: { eyebrow: "", titleA: "ความคืบหน้าของเรา", titleB: "", lede: "ตั้งแต่แบบร่างแรกจนถึงการเตรียมส่งมอบอุปกรณ์เครื่องแรก", current: "ขั้นตอนปัจจุบัน", donating: "กำลังเตรียมส่งมอบ", distribution: "ส่งมอบอุปกรณ์ให้ชุมชน", completed: "เสร็จแล้ว", here: "เราอยู่ตรงนี้", steps: [{ title: "ออกแบบอุปกรณ์", text: "เปลี่ยนแนวคิดให้เป็นอุปกรณ์ที่เด็กใช้งานได้ง่าย" }, { title: "ต้นแบบที่ใช้งานได้", text: "ประกอบปุ่ม หน้าจอ และระบบการทำงานหลัก" }, { title: "ทดสอบและปรับปรุง", text: "ทดลองใช้งานและนำคำแนะนำมาปรับปรุง" }, { title: "ส่งมอบอุปกรณ์ให้ชุมชน", text: "เตรียมส่งมอบอุปกรณ์เครื่องแรกให้มูลนิธิในกรุงเทพฯ" }] },
-    reach: { eyebrow: "พื้นที่ที่เรากำลังส่งมอบอุปกรณ์", titleA: "สะพานเล็ก ๆ", titleB: "ทั่วประเทศไทย", lede: "ดูพื้นที่ที่เรากำลังเตรียมส่งมอบ Emotion Sync ผ่านแผนที่ด้านล่าง", stat: "อยู่ระหว่างเตรียมส่งมอบ", bangkok: "กรุงเทพมหานคร", province: "จังหวัดที่กำลังส่งมอบ", recipient: "หน่วยงานที่รับมอบอุปกรณ์", recipientPending: "จะแสดงชื่อหน่วยงานเมื่อได้รับการยืนยัน", prompt: "แตะกรุงเทพฯ เพื่อดูรายละเอียด และแตะอีกครั้งเพื่อปิด", mapTitle: "แผนที่การส่งมอบ Emotion Sync", inProgress: "กำลังเตรียมส่งมอบ", caption: "กรุงเทพฯ เป็นพื้นที่แรกที่เรากำลังเตรียมส่งมอบอุปกรณ์ และเราหวังว่าจะขยายไปยังจังหวัดอื่นต่อไป", show: "กรุงเทพฯ แสดงหน่วยงานที่กำลังรับมอบอุปกรณ์", hide: "กรุงเทพฯ ซ่อนรายละเอียดหน่วยงาน" },
+    progress: { eyebrow: "", titleA: "ความคืบหน้าของเรา", titleB: "", lede: "จากแบบร่างแรก สู่การส่งมอบ Emotion Sync ให้มูลนิธิในกรุงเทพฯ", current: "ขั้นตอนปัจจุบัน", donating: "เริ่มส่งมอบแล้ว", distribution: "ส่งมอบอุปกรณ์ให้ชุมชน", completed: "เสร็จแล้ว", here: "เราอยู่ตรงนี้", steps: [{ title: "ออกแบบอุปกรณ์", text: "เปลี่ยนแนวคิดให้เป็นอุปกรณ์ที่เด็กใช้งานได้ง่าย" }, { title: "ต้นแบบที่ใช้งานได้", text: "ประกอบปุ่ม หน้าจอ และระบบการทำงานหลัก" }, { title: "ทดสอบและปรับปรุง", text: "ทดลองใช้งานและนำคำแนะนำมาปรับปรุง" }, { title: "ส่งมอบอุปกรณ์ให้ชุมชน", text: "ส่งมอบอุปกรณ์ให้มูลนิธิ 2 แห่งในกรุงเทพฯ และรับฟังคำแนะนำเพื่อนำมาปรับปรุง" }] },
+    reach: { eyebrow: "พื้นที่ที่เราส่งมอบอุปกรณ์", titleA: "สะพานเล็ก ๆ", titleB: "ทั่วประเทศไทย", lede: "ดูมูลนิธิทั้ง 2 แห่งที่ได้รับมอบ Emotion Sync ผ่านแผนที่ด้านล่าง", stat: "มูลนิธิที่ได้รับมอบ", bangkok: "กรุงเทพมหานคร", province: "จังหวัดที่ส่งมอบอุปกรณ์", recipient: "หน่วยงานที่รับมอบอุปกรณ์", recipientPending: "จะแสดงชื่อหน่วยงานเมื่อได้รับการยืนยัน", prompt: "แตะกรุงเทพฯ เพื่อดูรายละเอียด และแตะอีกครั้งเพื่อปิด", mapTitle: "แผนที่การส่งมอบ Emotion Sync", inProgress: "ส่งมอบอุปกรณ์แล้ว", caption: "เราส่งมอบ Emotion Sync ให้มูลนิธิ 2 แห่งในกรุงเทพฯ และกำลังนำคำแนะนำมาปรับปรุงอุปกรณ์", show: "กรุงเทพฯ แสดงหน่วยงานที่ได้รับมอบอุปกรณ์", hide: "กรุงเทพฯ ซ่อนรายละเอียดหน่วยงาน" },
     team: { eyebrow: "", titleA: "พบกับทีมของเรา", titleB: "", lede: "ทีมของเราประกอบด้วยนักเรียนจาก 2 โรงเรียนในกรุงเทพฯ ที่ร่วมกันดูแลงานด้านวิศวกรรม การออกแบบ และการประชาสัมพันธ์", roles: ["ผู้ก่อตั้ง", "ผู้ร่วมก่อตั้ง", "วิศวกร"], schools: ["โรงเรียนเตรียมอุดมศึกษา", "โรงเรียนนานาชาติ KPIS", "โรงเรียนเตรียมอุดมศึกษา"], details: ["ดูแลแนวคิดหลัก ออกแบบอุปกรณ์ สร้างต้นแบบ และประเมินผล", "ดูแลการประกอบ การทดสอบ การประชาสัมพันธ์ และการพัฒนาเว็บไซต์", "ดูแลรูปลักษณ์ภายนอก ตัวเครื่อง และส่วนใช้งานดิจิทัล"] },
     cta: { eyebrow: "", titleA: "ร่วมสนับสนุนโครงการ", titleB: "", text: "หากคุณเป็นครู ผู้ปกครอง ผู้ดูแล หรือองค์กรที่สนใจ คุณสามารถช่วยทดลอง ให้คำแนะนำ หรือร่วมสนับสนุนการส่งมอบ Emotion Sync ให้เด็ก ๆ ได้", conversation: "ติดต่อเรา", follow: "ติดตามเรา", subject: "ติดต่อ Project Little Bridge", body: "สวัสดีทีม Project Little Bridge\n\nสนใจสอบถามข้อมูลเพิ่มเติมเกี่ยวกับโครงการ Emotion Sync\n\nรายละเอียดที่ต้องการสอบถาม:\n", practiceEyebrow: "ฝึกออนไลน์ฟรี", practiceTitle: "ฝึกอารมณ์ออนไลน์", practiceText: "เริ่มแบบผู้เยี่ยมชมโดยบันทึกความก้าวหน้าในเบราว์เซอร์นี้ หรือสร้างบัญชีผู้ใหญ่ฟรีเพื่อเปิดดูข้อมูลจากอุปกรณ์อื่น โดยไม่มีการจับเวลาหรือแรงกดดันจากคะแนน", practiceButton: "เริ่มฝึกออนไลน์", formTitle: "ส่งข้อความถึงเรา", formIntro: "เลือกหัวข้อแล้วเขียนข้อความสั้น ๆ ถึงทีมของเรา", name: "ชื่อ", email: "อีเมล", organisation: "โรงเรียนหรือองค์กร (ไม่บังคับ)", reason: "เรื่องที่ต้องการติดต่อ", message: "ข้อความ", messagePlaceholder: "บอกเราเพิ่มเติมว่าคุณอยากร่วมสนับสนุนอย่างไร", submit: "ส่งข้อความ", sending: "กำลังส่ง…", success: "ส่งข้อความแล้ว ขอบคุณที่ติดต่อเรา เราจะตอบกลับโดยเร็ว", error: "ส่งข้อความไม่สำเร็จ กรุณาลองใหม่อีกครั้ง", formNote: "ข้อความจะถูกส่งถึงทีม Project Little Bridge โดยตรง", reasons: ["ร่วมเป็นพาร์ตเนอร์", "สนับสนุนค่าอุปกรณ์", "เชิญทีมไปนำเสนอ", "สอบถามทั่วไป"] },
     footer: { text: "ร่วมกันช่วยให้เด็กเข้าใจและสื่อสารความรู้สึกได้ง่ายขึ้น", follow: "ติดตาม Project Little Bridge", instagram: "ติดตาม Project Little Bridge บน Instagram", facebook: "ติดตาม Project Little Bridge บน Facebook", privacy: "ความเป็นส่วนตัว", top: "กลับขึ้นด้านบน ↑" },
-    a11y: { home: "หน้าแรก Project Little Bridge", primaryNav: "เมนูหลัก", mobileNav: "เมนูบนมือถือ", sessionSteps: "ขั้นตอนการใช้งานหนึ่งรอบ", resultNone: "ยังไม่ได้เลือกคำตอบ", resultCorrect: "ไฟสีเขียว ตอบถูก", resultWrong: "ไฟสีเหลือง ตอบผิด", principles: "แนวคิดของ Project Little Bridge", components: "ส่วนประกอบของ Emotion Sync", prototypeMain: "นักเรียนถือต้นแบบ Emotion Sync เครื่องแรก ซึ่งมีจอ OLED และปุ่มเลือกคำตอบ 4 ปุ่ม", prototypeControls: "ภาพระยะใกล้ของปุ่มและตัวเครื่อง Emotion Sync ที่ทีมประกอบด้วยมือ", prototypeLabel: "ด้านหลังของต้นแบบพร้อมป้าย Project Little Bridge", prototypeFeatures: "จุดเด่นของต้นแบบ", progressCurrent: "ขั้นตอนปัจจุบัน กำลังเตรียมส่งมอบอุปกรณ์ให้ชุมชน", reachStat: "หนึ่งจังหวัดอยู่ระหว่างเตรียมส่งมอบอุปกรณ์", mapAlt: "แผนที่ประเทศไทยที่เน้นกรุงเทพฯ ซึ่งเป็นพื้นที่แรกที่กำลังเตรียมส่งมอบอุปกรณ์", portrait: "ภาพของ", mapData: "ข้อมูลแผนที่" },
+    a11y: { home: "หน้าแรก Project Little Bridge", primaryNav: "เมนูหลัก", mobileNav: "เมนูบนมือถือ", sessionSteps: "ขั้นตอนการใช้งานหนึ่งรอบ", resultNone: "ยังไม่ได้เลือกคำตอบ", resultCorrect: "ไฟสีเขียว ตอบถูก", resultWrong: "ไฟสีเหลือง ตอบผิด", principles: "แนวคิดของ Project Little Bridge", components: "ส่วนประกอบของ Emotion Sync", prototypeMain: "นักเรียนถือต้นแบบ Emotion Sync เครื่องแรก ซึ่งมีจอ OLED และปุ่มเลือกคำตอบ 4 ปุ่ม", prototypeControls: "ภาพระยะใกล้ของปุ่มและตัวเครื่อง Emotion Sync ที่ทีมประกอบด้วยมือ", prototypeLabel: "ด้านหลังของต้นแบบพร้อมป้าย Project Little Bridge", prototypeFeatures: "จุดเด่นของต้นแบบ", progressCurrent: "ขั้นตอนปัจจุบัน เริ่มส่งมอบอุปกรณ์ให้ชุมชนแล้ว", reachStat: "มูลนิธิ 2 แห่งในกรุงเทพฯ ที่ได้รับมอบอุปกรณ์", mapAlt: "แผนที่ประเทศไทยที่เน้นกรุงเทพฯ ซึ่งเป็นพื้นที่แรกที่ได้รับมอบอุปกรณ์", portrait: "ภาพของ", mapData: "ข้อมูลแผนที่" },
   },
 } as const;
 
 export default function Home() {
   const [language, setLanguage] = useState<Language>("en");
+  const [selectedVisitId, setSelectedVisitId] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedEmotion, setSelectedEmotion] = useState<EmotionChoice | null>(null);
   const [quizEmotion, setQuizEmotion] = useState<EmotionChoice | null>(null);
@@ -265,7 +260,8 @@ export default function Home() {
   const sessionTarget: EmotionChoice = "happy";
   const sessionCorrect = sessionEmotion === sessionTarget;
   const activeProvinceId = hoveredProvinceId ?? selectedProvinceId;
-  const activeDonation = activeProvinceId === "bkk" ? bangkokDonation : null;
+  const provinceDonations = donations.filter(visit => visit.provinceId === activeProvinceId);
+  const activeDonation = provinceDonations.length > 0;
   const emotionLabel = (emotion: EmotionChoice) => c.emotions[emotion];
 
   const resetSession = () => {
@@ -859,7 +855,7 @@ export default function Home() {
           <p className="reach-lede">{c.reach.lede}</p>
 
           <div className="reach-stat" aria-label={c.a11y.reachStat}>
-            <strong>01</strong>
+            <strong>{String(donations.length).padStart(2, "0")}</strong>
             <span>{c.reach.stat}<br /><b>{c.reach.bangkok}</b></span>
           </div>
 
@@ -868,15 +864,11 @@ export default function Home() {
               <>
                 <div className="donation-card-top">
                   <span className="donation-pin" aria-hidden="true">●</span>
-                  <p><small>{c.reach.province}</small><strong>{c.reach.bangkok}</strong></p>
+                  <p><small>{c.reach.province}</small><strong>{provinceDonations[0]?.province[language]}</strong></p>
                 </div>
                 <div className="donation-places">
                   <small>{c.reach.recipient}</small>
-                  {activeDonation.places[language].length ? (
-                    <ul>{activeDonation.places[language].map((place) => <li key={place}>{place}</li>)}</ul>
-                  ) : (
-                    <p>{c.reach.recipientPending}</p>
-                  )}
+                  <ol className="donation-location-list">{provinceDonations.map((visit, index) => <li key={visit.id}><span aria-hidden="true">{index + 1}.</span><button type="button" onClick={() => setSelectedVisitId(visit.id)}>{visit.name[language]}</button></li>)}</ol>
                 </div>
               </>
             ) : (
@@ -899,10 +891,17 @@ export default function Home() {
           >
             {(thailandMap.locations as Array<{ id: string; name: string; path: string }>).map((location) => (
               <path
-                className={`map-province${location.id === "bkk" ? " is-donated" : ""}`}
+                className={`map-province${donations.some(visit => visit.provinceId === location.id) ? " is-donated" : ""}`}
                 d={location.path}
                 key={location.id}
-                aria-hidden="true"
+                role={donations.some(visit => visit.provinceId === location.id) ? "button" : undefined}
+                tabIndex={donations.some(visit => visit.provinceId === location.id) ? 0 : undefined}
+                aria-label={donations.find(visit => visit.provinceId === location.id)?.province[language]}
+                aria-hidden={donations.some(visit => visit.provinceId === location.id) ? undefined : true}
+                onClick={() => { if (donations.some(visit => visit.provinceId === location.id)) { setSelectedProvinceId(location.id); setHoveredProvinceId(null); } }}
+                onFocus={() => { if (donations.some(visit => visit.provinceId === location.id)) setHoveredProvinceId(location.id); }}
+                onBlur={() => setHoveredProvinceId(null)}
+                onKeyDown={(event) => { if ((event.key === "Enter" || event.key === " ") && donations.some(visit => visit.provinceId === location.id)) { event.preventDefault(); setSelectedProvinceId(location.id); setHoveredProvinceId(null); } }}
               />
             ))}
             <g
@@ -936,6 +935,8 @@ export default function Home() {
           <small className="map-credit">{c.a11y.mapData}: @svg-maps/thailand, CC BY 4.0.</small>
         </div>
       </section>
+
+      <DonationDirectory language={language} selectedId={selectedVisitId} onSelect={setSelectedVisitId} onLanguage={setLanguage} />
 
       <section className="team-section" id="team">
         <div className="section-heading">
