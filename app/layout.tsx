@@ -23,7 +23,7 @@ const thaiFont = Noto_Sans_Thai({
 
 export const metadata: Metadata = {
 icons: {
-  icon: "/project-little-bridge-logo.png",
+  icon: "/plb-favicon.png",
 },
   title: "Project Little Bridge | Emotion Sync",
   description:
