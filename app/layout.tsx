@@ -22,6 +22,9 @@ const thaiFont = Noto_Sans_Thai({
 });
 
 export const metadata: Metadata = {
+icons: {
+  icon: "/project-little-bridge-logo.png",
+},
   title: "Project Little Bridge | Emotion Sync",
   description:
     "Project Little Bridge is a student-led initiative creating Emotion Sync, a handheld learning tool for neurodivergent children.",
