@@ -1,45 +1,48 @@
-PROJECT LITTLE BRIDGE — SEPTEMBER 2026 UPDATE
+PROJECT LITTLE BRIDGE — PROTOTYPE 03 UPDATE — 25 SEPTEMBER 2026
 
-This ZIP contains the complete website source for GitHub and Netlify.
+This is an UPDATE package for your existing website repository, not a standalone website.
+It includes the latest preview changes: full-screen hero, Prototype 03 device spacing,
+centered shared emotion faces, yellow Play/Start buttons, guided game visuals,
+and Firebase guest profiles/results with migration of existing browser progress.
 
+FIREBASE FIRST
+1. Open Firebase Console and select the project's existing Firebase project.
+2. Authentication > Sign-in method > Anonymous > Enable > Save.
+3. Open the included firestore.rules in a text editor and copy ALL its contents.
+4. Firestore Database > Rules: replace the editor contents, then click Publish.
+   Pushing this file to GitHub does not publish the rules automatically.
+5. If Identity Platform automatic anonymous-account cleanup is enabled, turn it off
+   to retain guest sign-in access beyond 30 days.
+
+GITHUB DESKTOP / NETLIFY
 1. Extract this ZIP.
-2. Open Firebase Console > your Project Little Bridge project > Firestore Database > Rules.
-   Replace the editor contents with the included firestore.rules, then click Publish.
-   This is required for the new unique-browser counter. Uploading to GitHub does not publish rules.
-3. In GitHub Desktop, open your existing project-little-bridge-source repository.
-   Fetch origin / pull first if Desktop offers it.
-4. Choose Show in Explorer (Windows) or Show in Finder (Mac).
-5. Copy ALL CONTENTS of the extracted folder into that repository folder.
-   Replace matching files. package.json, app, public and netlify.toml belong directly in the repository root.
-   Keep the repository's .git folder. Do not copy node_modules, .next, out or the ZIP itself.
-6. Return to GitHub Desktop. Review the changes, commit to main, then Push origin.
-7. In Netlify > Deploys, wait for Published. Then open projectlittlebridge.org and refresh.
+2. Open your existing project-little-bridge-source repository in GitHub Desktop.
+   Fetch origin and pull any remote changes before copying.
+3. Click Show in Explorer.
+4. Copy ALL contents from this extracted update folder INTO the existing repository.
+   Merge folders and replace matching files. Do NOT delete your existing project.
+   Keep your existing app/layout.tsx, favicon, public images/audio, and other files.
+   Do not nest the update folder inside the repository.
+5. In GitHub Desktop, review changes. Summary: Update Prototype 03 and guest cloud saving
+6. Commit to main, then Push origin.
+7. Wait for Netlify > Deploys to say Published, then refresh projectlittlebridge.org.
 
-Use GitHub Desktop for the public folder: GitHub's browser uploader has a file-count limit.
-The build command remains npm run build (next build), and Netlify publishes out.
+VERIFY ON YOUR REAL WEBSITE
+- Continue as guest and accept cloud saving, or use Save existing progress online.
+- Complete an activity, reload, and check the correct profile's history.
+- Confirm the guest UID appears in Firebase Authentication > Users.
+- In Firestore, inspect users > that UID > children > profile ID > events.
+
+Existing browser data can migrate only when the visitor returns to the SAME domain
+in the SAME browser and accepts the upload notice. The review preview cannot read
+browser progress stored on projectlittlebridge.org. Keep browser data until sync succeeds.
+Guest and adult sign-in data remain separate. Clearing browser data can lose access to
+the anonymous guest account, even though its cloud records remain.
+
+The app/layout.tsx and favicon files are intentionally omitted to preserve your custom
+bridge search icon. Existing site content/assets must stay in your repository.
+Build settings use npm run build (next build), Node 22, and the out publish directory.
 No scripts/build-verified.sh is required.
 
-CHECK VISITOR NUMBERS
-Firebase Console > Firestore Database > Data > publicMetrics:
-- siteVisits > count: total full website loads, including refreshes.
-- uniqueBrowsers > count: browser UUIDs registered since this update was deployed.
-
-These are estimated unique BROWSERS, not verified people or guest-only users.
-The same browser is counted once even if its visitor signs in later.
-Another browser/device, private browsing or clearing site data can count again.
-Older visits cannot be reconstructed into unique visitors.
-Blocked storage or blocked Firebase requests may prevent counting. Automated traffic can inflate it.
-The browserVisitors collection stores random IDs and first registration times only.
-Child names, activity answers and account IDs are not sent to the visitor counter.
-
-PROFILES AND PROGRESS
-Signed in: Manage profile > Add another child. Each child has separate saved history in the same account.
-Guest: progress stays in this browser and survives reloads. Existing guest history remains compatible.
-Deleting guest progress leaves the separate visitor ID in place to avoid double-counting.
-Signing in does not automatically upload guest history.
-
-AFTER DEPLOYMENT
-- Check the Autistic Thai Foundation photos and English/Thai copy on the homepage.
-- Complete a guest activity, reload and check its progress history.
-- Create/switch between two account profiles and confirm their results stay separate.
-- Open the site twice in one browser: siteVisits increases twice; uniqueBrowsers only once.
+Validation: production build and TypeScript passed for the preview; migration tests use
+mocked Firebase. Live anonymous sign-in/rules still require the check above.

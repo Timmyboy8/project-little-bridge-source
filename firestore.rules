@@ -50,6 +50,15 @@ service cloud.firestore {
             ? get(/databases/$(database)/documents/publicMetrics/uniqueBrowsers).data.count + 1 : 1);
     }
 
+    match /users/{userId} {
+      allow read: if ownsUserSpace(userId);
+      allow create, update: if ownsUserSpace(userId)
+        && request.auth.token.firebase.sign_in_provider == 'anonymous'
+        && request.resource.data.keys().hasOnly(['accountType', 'updatedAt'])
+        && request.resource.data.accountType == 'guest'
+        && request.resource.data.updatedAt == request.time;
+    }
+
     match /users/{userId}/children/{childId} {
       allow read, delete: if ownsUserSpace(userId);
       allow create, update: if ownsUserSpace(userId)

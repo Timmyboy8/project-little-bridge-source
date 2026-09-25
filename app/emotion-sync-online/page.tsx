@@ -1,9 +1,11 @@
 "use client";
+import EmotionFace from "../EmotionFace";
 
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { getOrCreateBrowserId } from "../browser-identity";
+import { startGuestCloud, syncGuestCloud, readGuestCache, guestCloudEnabled, queueGuestEvent, addGuestProfile, removeGuestProfiles, type GuestCache, type GuestEvent } from "../guest-cloud";
 import {
   createAdultWithEmail,
   createFirebaseChild,
@@ -32,7 +34,6 @@ type ReportRange = "all" | "30" | "90";
 
 type Emotion = {
   id: EmotionId;
-  face: string;
   en: string;
   th: string;
   color: "yellow" | "black" | "blue" | "red";
@@ -102,10 +103,10 @@ type EverydayScene = {
 };
 
 const emotions: Emotion[] = [
-  { id: "angry", face: ">︵<", en: "Angry", th: "โกรธ", color: "red", learnEn: "A strong feeling when something seems unfair, upsetting, or needs to stop.", learnTh: "ความรู้สึกแรงเมื่อบางอย่างทำให้ไม่พอใจ ดูไม่ยุติธรรม หรือเราอยากให้หยุด" },
-  { id: "happy", face: "•‿•", en: "Happy", th: "มีความสุข", color: "yellow", learnEn: "A light, good feeling. You might smile or want to share it.", learnTh: "ความรู้สึกดีและเบาสบาย อาจทำให้เราอยากยิ้มหรือแบ่งปันความสุข" },
-  { id: "sad", face: "•︵•", en: "Sad", th: "เศร้า", color: "blue", learnEn: "A heavy or low feeling. You may want comfort or some quiet time.", learnTh: "ความรู้สึกหนักหรือไม่สบายใจ เราอาจอยากได้รับกำลังใจหรืออยู่เงียบ ๆ สักพัก" },
-  { id: "calm", face: "–‿–", en: "Calm", th: "สงบ", color: "black", learnEn: "A quiet, settled feeling. Your body may feel relaxed.", learnTh: "ความรู้สึกนิ่งและผ่อนคลาย ร่างกายอาจรู้สึกสบายขึ้น" },
+  { id: "angry", en: "Angry", th: "โกรธ", color: "red", learnEn: "A strong feeling when something seems unfair, upsetting, or needs to stop.", learnTh: "ความรู้สึกแรงเมื่อบางอย่างทำให้ไม่พอใจ ดูไม่ยุติธรรม หรือเราอยากให้หยุด" },
+  { id: "happy", en: "Happy", th: "มีความสุข", color: "yellow", learnEn: "A light, good feeling. You might smile or want to share it.", learnTh: "ความรู้สึกดีและเบาสบาย อาจทำให้เราอยากยิ้มหรือแบ่งปันความสุข" },
+  { id: "sad", en: "Sad", th: "เศร้า", color: "blue", learnEn: "A heavy or low feeling. You may want comfort or some quiet time.", learnTh: "ความรู้สึกหนักหรือไม่สบายใจ เราอาจอยากได้รับกำลังใจหรืออยู่เงียบ ๆ สักพัก" },
+  { id: "calm", en: "Calm", th: "สงบ", color: "black", learnEn: "A quiet, settled feeling. Your body may feel relaxed.", learnTh: "ความรู้สึกนิ่งและผ่อนคลาย ร่างกายอาจรู้สึกสบายขึ้น" },
 ];
 
 const emotionOrder: EmotionId[] = ["angry", "happy", "sad", "calm"];
@@ -198,7 +199,7 @@ const copy = {
     results: "Session summary", resultsText: "This result describes this practice session. It is educational progress information, not a diagnosis.",
     accuracy: "Accuracy", response: "Median response time", seconds: "sec", byEmotion: "By emotion", byActivity: "By activity", responses: "responses",
     morePractice: "More practice will make trends clearer.", again: "Start another check", home: "Choose another activity",
-    report: "Comprehensive progress report", reportIntro: "This report combines every activity the child completes. It supports adult observation and learning decisions; it is not a diagnosis.", noHistory: "Complete any activity to begin the report.", totalSessions: "Activities completed", totalQuestions: "Scored answers", recentTrend: "Recent scored accuracy", history: "Complete activity history", needsPractice: "Suggested focus", balanced: "More sessions are needed before suggesting one focus", confusion: "Most common mix-up", noConfusion: "No repeated mix-up yet", reportNotice: "Activity history is saved to the selected account or browser profile.", saveStatus: "Saved to account", savingActivity: "Saving to account…", saveFailed: "This activity could not be saved. Check the internet connection and try it again.", openReport: "View progress", allSessions: "All scored skills", guidedSession: "Guided practice", checkSession: "Progress check", everydaySession: "Everyday feelings", learnSession: "Explore feelings", deviceSession: "Device practice", activityCoverage: "Activity coverage", reflectionsTitle: "Feelings in everyday situations", reflectionsText: "Each entry connects the situation with the feeling the child chose, how strong it felt, and what they thought might help. These are personal responses—not right or wrong answers.", reflectionResponses: "responses", reflectionStrength: "Strength", reflectionSupport: "Might help", noReflections: "Complete Everyday Feelings to connect feelings with situations.", allFeelings: "All feelings", allTime: "All time", last30Days: "Last 30 days", last90Days: "Last 90 days", showing: "Showing", entries: "entries", previous: "Previous", nextPage: "Next", noFilteredReflections: "No responses match these filters.", exportTitle: "Download progress data", exportText: "Download every saved activity for this child as a CSV file that opens directly in Google Sheets, Microsoft Excel, or another spreadsheet app.", exportButton: "Download CSV", exportIncludes: "Includes scored answers, response times, Everyday Feelings selections, Explore Feelings, and Device Practice.", exportReady: "CSV downloaded.", exportLanguageTitle: "Choose the spreadsheet language", exportLanguageText: "Column headings and readable responses will use the language you choose.", exportEnglish: "Download in English", exportThai: "ดาวน์โหลดภาษาไทย", exportCancel: "Cancel", adultAccount: "Progress storage", account: "Account", signIn: "Sign in or create account", signInProvider: "Continue with Google", setupRequired: "Online accounts are not configured yet.", signInText: "A parent, teacher, or therapist can sign in for cloud saving across devices.", syncAcross: "Choose how to save progress", syncAcrossText: "Continue as a guest to save on this browser, or sign in to keep progress available across devices.", signedInAs: "Signed in as", tracking: "Currently tracking", syncedAcross: "Every completed activity is saved online to this child profile and appears on your other devices.", childProfile: "Child profile", selectedChild: "Selected child", switchChild: "Switch child", manageChild: "Manage profile", profileOptions: "Profile options", addChild: "Add another child", nickname: "Child nickname", nicknameHint: "Use a nickname only. Do not enter a full legal name.", create: "Create profile", createFirst: "Create the first child profile", signOut: "Sign out", cloudPrivate: "Private account storage", accountRequired: "Choose guest mode or sign in", accountRequiredText: "Guest progress stays in this browser. Signed-in progress is saved to the adult account and follows them across devices.", guestButton: "Continue as guest", guestName: "Guest profile", guestLocal: "Saved in this browser", guestDeviceOnly: "Progress is stored only in this browser and may be lost if browser data is cleared.", signInCloud: "Sign in for cloud sync", deleteGuest: "Delete browser data", deleteGuestConfirm: "Delete all guest progress stored in this browser? This cannot be undone.", syncError: "We could not reach the online account. Your cloud activity was not saved.", deleteChild: "Delete profile & data", deleteConfirm: "Permanently delete this child profile and all of its activity history? This cannot be undone.", consent: "I am an adult responsible for this child and consent to storing this nickname and activity history online.", privacy: "Privacy & data use", intensityTitle: "How strong is the feeling?", supportTitle: "What might help?", intensities: ["A little", "In the middle", "A lot"], supports: ["Quiet space", "Talk to someone", "Ask for help", "Try again"], saveReflection: "Save & see another situation", category: "Situation type", categories: { home: "Home", school: "School", friends: "Friends", change: "Change", sensory: "Sensory", achievement: "Achievement" },
+    report: "Comprehensive progress report", reportIntro: "This report combines every activity the child completes. It supports adult observation and learning decisions; it is not a diagnosis.", noHistory: "Complete any activity to begin the report.", totalSessions: "Activities completed", totalQuestions: "Scored answers", recentTrend: "Recent scored accuracy", history: "Complete activity history", needsPractice: "Suggested focus", balanced: "More sessions are needed before suggesting one focus", confusion: "Most common mix-up", noConfusion: "No repeated mix-up yet", reportNotice: "Activity history is saved to the selected account or browser profile.", saveStatus: "Saved to account", savingActivity: "Saving to account…", saveFailed: "This activity could not be saved. Check the internet connection and try it again.", openReport: "View progress", allSessions: "All scored skills", guidedSession: "Guided practice", checkSession: "Progress check", everydaySession: "Everyday feelings", learnSession: "Explore feelings", deviceSession: "Device practice", activityCoverage: "Activity coverage", reflectionsTitle: "Feelings in everyday situations", reflectionsText: "Each entry connects the situation with the feeling the child chose, how strong it felt, and what they thought might help. These are personal responses—not right or wrong answers.", reflectionResponses: "responses", reflectionStrength: "Strength", reflectionSupport: "Might help", noReflections: "Complete Everyday Feelings to connect feelings with situations.", allFeelings: "All feelings", allTime: "All time", last30Days: "Last 30 days", last90Days: "Last 90 days", showing: "Showing", entries: "entries", previous: "Previous", nextPage: "Next", noFilteredReflections: "No responses match these filters.", exportTitle: "Download progress data", exportText: "Download every saved activity for this child as a CSV file that opens directly in Google Sheets, Microsoft Excel, or another spreadsheet app.", exportButton: "Download CSV", exportIncludes: "Includes scored answers, response times, Everyday Feelings selections, Explore Feelings, and Device Practice.", exportReady: "CSV downloaded.", exportLanguageTitle: "Choose the spreadsheet language", exportLanguageText: "Column headings and readable responses will use the language you choose.", exportEnglish: "Download in English", exportThai: "ดาวน์โหลดภาษาไทย", exportCancel: "Cancel", adultAccount: "Progress storage", account: "Account", signIn: "Sign in or create account", signInProvider: "Continue with Google", setupRequired: "Online accounts are not configured yet.", signInText: "A parent, teacher, or therapist can sign in for cloud saving across devices.", syncAcross: "Choose how to save progress", syncAcrossText: "Guests can save profiles and results privately online without an email. Sign in to access an adult account across devices.", signedInAs: "Signed in as", tracking: "Currently tracking", syncedAcross: "Every completed activity is saved online to this child profile and appears on your other devices.", childProfile: "Child profile", selectedChild: "Selected child", switchChild: "Switch child", manageChild: "Manage profile", profileOptions: "Profile options", addChild: "Add another child", nickname: "Child nickname", nicknameHint: "Use a nickname only. Do not enter a full legal name.", create: "Create profile", createFirst: "Create the first child profile", signOut: "Sign out", cloudPrivate: "Private account storage", accountRequired: "Choose guest mode or sign in", accountRequiredText: "Guest profiles and results are saved to a private guest account. This browser keeps the key to that account.", guestButton: "Continue as guest", guestName: "Guest profile", guestLocal: "Guest cloud saving", guestDeviceOnly: "Guest profiles and results sync to Firebase. Keep this browser’s data: clearing it can remove access to your guest account.", signInCloud: "Sign in for cloud sync", deleteGuest: "Delete all guest profiles", deleteGuestConfirm: "Delete all profiles and results from this guest account and its browser copy? This cannot be undone.", syncError: "We could not reach the online account. Your cloud activity was not saved.", deleteChild: "Delete profile & data", deleteConfirm: "Permanently delete this child profile and all of its activity history? This cannot be undone.", consent: "I am an adult responsible for this child and consent to storing this nickname and activity history online.", privacy: "Privacy & data use", intensityTitle: "How strong is the feeling?", supportTitle: "What might help?", intensities: ["A little", "In the middle", "A lot"], supports: ["Quiet space", "Talk to someone", "Ask for help", "Try again"], saveReflection: "Save & see another situation", category: "Situation type", categories: { home: "Home", school: "School", friends: "Friends", change: "Change", sensory: "Sensory", achievement: "Achievement" },
     authSignInTitle: "Adult sign in", authCreateTitle: "Create an adult account", authIntro: "Sign in to keep each child's activity history private and available across devices.", authGoogle: "Continue with Google", authOr: "or use email", authEmail: "Email address", authPassword: "Password", authConfirm: "Confirm password", authEmailSignIn: "Sign in with email", authCreate: "Create account", authNeedAccount: "New to Emotion Sync?", authHaveAccount: "Already have an account?", authCreateLink: "Create an account", authSignInLink: "Sign in", authForgot: "Forgot password?", authResetSent: "Password reset email sent. Check your inbox.", authEnterEmail: "Enter your email address first.", authMismatch: "The passwords do not match.", authInvalid: "The email or password is incorrect.", authEmailUsed: "An account already exists for this email.", authWeak: "Use a password with at least 6 characters.", authDomain: "This website still needs to be added to Firebase Authorized domains.", authGeneric: "We could not complete sign-in. Please try again.", authClose: "Close sign in",
     learnTitle: "Learn the four feelings", hear: "Hear", mightFeel: "How might you feel?", reflection: "That feeling can make sense.", reflectionText: "Different people can feel differently in the same situation. Naming your feeling is the important part.", another: "Another situation",
     pressStart: "Press Start", which: "Which feeling is this?", startHint: "Start a new round when you are ready.", audioError: "The audio could not play. Please try again.",
@@ -229,7 +230,7 @@ const copy = {
     results: "สรุปรอบการฝึก", resultsText: "ผลนี้แสดงการฝึกในรอบนี้ เป็นข้อมูลเพื่อการเรียนรู้ ไม่ใช่การวินิจฉัย",
     accuracy: "ความแม่นยำ", response: "เวลาตอบค่ากลาง", seconds: "วินาที", byEmotion: "แยกตามอารมณ์", byActivity: "แยกตามกิจกรรม", responses: "คำตอบ",
     morePractice: "ฝึกเพิ่มอีกหลายรอบเพื่อให้เห็นแนวโน้มชัดขึ้น", again: "ตรวจความก้าวหน้าอีกครั้ง", home: "เลือกกิจกรรมอื่น",
-    report: "รายงานความก้าวหน้าแบบละเอียด", reportIntro: "รายงานนี้รวมทุกกิจกรรมที่เด็กทำ เพื่อช่วยผู้ใหญ่สังเกตและวางแผนการเรียนรู้ ไม่ใช่การวินิจฉัย", noHistory: "ทำกิจกรรมใดก็ได้เพื่อเริ่มสร้างรายงาน", totalSessions: "กิจกรรมที่ทำเสร็จ", totalQuestions: "คำตอบที่มีคะแนน", recentTrend: "ความแม่นยำล่าสุด", history: "ประวัติกิจกรรมทั้งหมด", needsPractice: "อารมณ์ที่ควรฝึกเพิ่ม", balanced: "ต้องมีผลจากหลายรอบมากขึ้นก่อนแนะนำอารมณ์ที่ควรเน้น", confusion: "คำตอบที่มักสับสน", noConfusion: "ยังไม่พบรูปแบบที่สับสนซ้ำ", reportNotice: "ประวัติกิจกรรมจะบันทึกในบัญชีหรือโปรไฟล์เบราว์เซอร์ที่เลือก", saveStatus: "บันทึกในบัญชีแล้ว", savingActivity: "กำลังบันทึกในบัญชี…", saveFailed: "บันทึกกิจกรรมนี้ไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตแล้วทำกิจกรรมอีกครั้ง", openReport: "ดูความก้าวหน้า", allSessions: "ทักษะที่มีคะแนนทั้งหมด", guidedSession: "ฝึกพร้อมคำแนะนำ", checkSession: "ตรวจความก้าวหน้า", everydaySession: "อารมณ์ในชีวิตประจำวัน", learnSession: "เรียนรู้อารมณ์", deviceSession: "ฝึกกับอุปกรณ์", activityCoverage: "กิจกรรมที่ทำ", reflectionsTitle: "ความรู้สึกในแต่ละสถานการณ์", reflectionsText: "แต่ละรายการเชื่อมโยงสถานการณ์กับอารมณ์ที่เด็กเลือก ระดับความรู้สึก และสิ่งที่เด็กคิดว่าอาจช่วยได้ คำตอบเหล่านี้ไม่มีถูกหรือผิด", reflectionResponses: "คำตอบ", reflectionStrength: "ระดับความรู้สึก", reflectionSupport: "สิ่งที่อาจช่วย", noReflections: "ทำกิจกรรมอารมณ์ในชีวิตประจำวันเพื่อเชื่อมโยงความรู้สึกกับสถานการณ์", allFeelings: "ทุกอารมณ์", allTime: "ตลอดเวลา", last30Days: "30 วันที่ผ่านมา", last90Days: "90 วันที่ผ่านมา", showing: "แสดง", entries: "รายการ", previous: "ก่อนหน้า", nextPage: "ถัดไป", noFilteredReflections: "ไม่มีคำตอบที่ตรงกับตัวกรองนี้", exportTitle: "ดาวน์โหลดข้อมูลความก้าวหน้า", exportText: "ดาวน์โหลดทุกกิจกรรมที่บันทึกไว้ของเด็กคนนี้เป็นไฟล์ CSV ซึ่งเปิดใน Google Sheets, Microsoft Excel หรือแอปตารางคำนวณอื่นได้ทันที", exportButton: "ดาวน์โหลด CSV", exportIncludes: "ประกอบด้วยคำตอบที่มีคะแนน เวลาตอบ อารมณ์ในชีวิตประจำวัน การเรียนรู้อารมณ์ และการฝึกกับอุปกรณ์", exportReady: "ดาวน์โหลดไฟล์ CSV แล้ว", exportLanguageTitle: "เลือกภาษาของตารางข้อมูล", exportLanguageText: "หัวตารางและคำตอบที่อ่านได้จะแสดงเป็นภาษาที่เลือก", exportEnglish: "Download in English", exportThai: "ดาวน์โหลดภาษาไทย", exportCancel: "ยกเลิก", adultAccount: "การบันทึกความก้าวหน้า", account: "บัญชี", signIn: "เข้าสู่ระบบหรือสร้างบัญชี", signInProvider: "เข้าสู่ระบบด้วย Google", setupRequired: "ยังไม่ได้ตั้งค่าบัญชีออนไลน์", signInText: "ผู้ปกครอง ครู หรือนักบำบัดสามารถเข้าสู่ระบบเพื่อบันทึกข้อมูลบนคลาวด์และใช้ข้ามอุปกรณ์", syncAcross: "เลือกวิธีบันทึกความก้าวหน้า", syncAcrossText: "ใช้แบบผู้เยี่ยมชมเพื่อบันทึกในเบราว์เซอร์นี้ หรือเข้าสู่ระบบเพื่อเปิดดูความก้าวหน้าจากอุปกรณ์อื่น", signedInAs: "เข้าสู่ระบบในชื่อ", tracking: "กำลังบันทึกให้", syncedAcross: "ทุกกิจกรรมที่ทำเสร็จจะบันทึกออนไลน์ในโปรไฟล์นี้และเปิดดูได้จากอุปกรณ์อื่น", childProfile: "โปรไฟล์เด็ก", selectedChild: "โปรไฟล์ที่เลือก", switchChild: "เปลี่ยนโปรไฟล์เด็ก", manageChild: "จัดการโปรไฟล์", profileOptions: "ตัวเลือกโปรไฟล์", addChild: "เพิ่มโปรไฟล์เด็ก", nickname: "ชื่อเล่นของเด็ก", nicknameHint: "ใช้ชื่อเล่นเท่านั้น ไม่ควรกรอกชื่อ-นามสกุลจริง", create: "สร้างโปรไฟล์", createFirst: "สร้างโปรไฟล์เด็กคนแรก", signOut: "ออกจากระบบ", cloudPrivate: "จัดเก็บอย่างเป็นส่วนตัวในบัญชี", accountRequired: "เลือกใช้แบบผู้เยี่ยมชมหรือเข้าสู่ระบบ", accountRequiredText: "ข้อมูลผู้เยี่ยมชมเก็บในเบราว์เซอร์นี้เท่านั้น ส่วนข้อมูลที่เข้าสู่ระบบจะบันทึกในบัญชีผู้ใหญ่และใช้ข้ามอุปกรณ์ได้", guestButton: "ใช้แบบผู้เยี่ยมชม", guestName: "โปรไฟล์ผู้เยี่ยมชม", guestLocal: "บันทึกในเบราว์เซอร์นี้", guestDeviceOnly: "ข้อมูลเก็บเฉพาะในเบราว์เซอร์นี้และอาจหายไปเมื่อล้างข้อมูลเบราว์เซอร์", signInCloud: "เข้าสู่ระบบเพื่อบันทึกบนคลาวด์", deleteGuest: "ลบข้อมูลในเบราว์เซอร์", deleteGuestConfirm: "ลบความก้าวหน้าของผู้เยี่ยมชมทั้งหมดที่เก็บในเบราว์เซอร์นี้หรือไม่ การดำเนินการนี้ย้อนกลับไม่ได้", syncError: "ไม่สามารถเชื่อมต่อบัญชีออนไลน์ได้ กิจกรรมบนคลาวด์ไม่ได้ถูกบันทึก", deleteChild: "ลบโปรไฟล์และข้อมูล", deleteConfirm: "ลบโปรไฟล์เด็กนี้และประวัติกิจกรรมทั้งหมดอย่างถาวรหรือไม่ การดำเนินการนี้ย้อนกลับไม่ได้", consent: "ฉันเป็นผู้ใหญ่ที่รับผิดชอบเด็กคนนี้และยินยอมให้จัดเก็บชื่อเล่นและประวัติกิจกรรมทางออนไลน์", privacy: "ความเป็นส่วนตัวและการใช้ข้อมูล", intensityTitle: "ความรู้สึกนี้แรงแค่ไหน?", supportTitle: "อะไรอาจช่วยได้?", intensities: ["เล็กน้อย", "ปานกลาง", "มาก"], supports: ["อยู่ในที่เงียบ", "คุยกับใครสักคน", "ขอความช่วยเหลือ", "ลองอีกครั้ง"], saveReflection: "บันทึกและดูสถานการณ์ถัดไป", category: "ประเภทสถานการณ์", categories: { home: "ที่บ้าน", school: "โรงเรียน", friends: "เพื่อน", change: "การเปลี่ยนแปลง", sensory: "สิ่งกระตุ้นรอบตัว", achievement: "ความสำเร็จ" },
+    report: "รายงานความก้าวหน้าแบบละเอียด", reportIntro: "รายงานนี้รวมทุกกิจกรรมที่เด็กทำ เพื่อช่วยผู้ใหญ่สังเกตและวางแผนการเรียนรู้ ไม่ใช่การวินิจฉัย", noHistory: "ทำกิจกรรมใดก็ได้เพื่อเริ่มสร้างรายงาน", totalSessions: "กิจกรรมที่ทำเสร็จ", totalQuestions: "คำตอบที่มีคะแนน", recentTrend: "ความแม่นยำล่าสุด", history: "ประวัติกิจกรรมทั้งหมด", needsPractice: "อารมณ์ที่ควรฝึกเพิ่ม", balanced: "ต้องมีผลจากหลายรอบมากขึ้นก่อนแนะนำอารมณ์ที่ควรเน้น", confusion: "คำตอบที่มักสับสน", noConfusion: "ยังไม่พบรูปแบบที่สับสนซ้ำ", reportNotice: "ประวัติกิจกรรมจะบันทึกในบัญชีหรือโปรไฟล์เบราว์เซอร์ที่เลือก", saveStatus: "บันทึกในบัญชีแล้ว", savingActivity: "กำลังบันทึกในบัญชี…", saveFailed: "บันทึกกิจกรรมนี้ไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตแล้วทำกิจกรรมอีกครั้ง", openReport: "ดูความก้าวหน้า", allSessions: "ทักษะที่มีคะแนนทั้งหมด", guidedSession: "ฝึกพร้อมคำแนะนำ", checkSession: "ตรวจความก้าวหน้า", everydaySession: "อารมณ์ในชีวิตประจำวัน", learnSession: "เรียนรู้อารมณ์", deviceSession: "ฝึกกับอุปกรณ์", activityCoverage: "กิจกรรมที่ทำ", reflectionsTitle: "ความรู้สึกในแต่ละสถานการณ์", reflectionsText: "แต่ละรายการเชื่อมโยงสถานการณ์กับอารมณ์ที่เด็กเลือก ระดับความรู้สึก และสิ่งที่เด็กคิดว่าอาจช่วยได้ คำตอบเหล่านี้ไม่มีถูกหรือผิด", reflectionResponses: "คำตอบ", reflectionStrength: "ระดับความรู้สึก", reflectionSupport: "สิ่งที่อาจช่วย", noReflections: "ทำกิจกรรมอารมณ์ในชีวิตประจำวันเพื่อเชื่อมโยงความรู้สึกกับสถานการณ์", allFeelings: "ทุกอารมณ์", allTime: "ตลอดเวลา", last30Days: "30 วันที่ผ่านมา", last90Days: "90 วันที่ผ่านมา", showing: "แสดง", entries: "รายการ", previous: "ก่อนหน้า", nextPage: "ถัดไป", noFilteredReflections: "ไม่มีคำตอบที่ตรงกับตัวกรองนี้", exportTitle: "ดาวน์โหลดข้อมูลความก้าวหน้า", exportText: "ดาวน์โหลดทุกกิจกรรมที่บันทึกไว้ของเด็กคนนี้เป็นไฟล์ CSV ซึ่งเปิดใน Google Sheets, Microsoft Excel หรือแอปตารางคำนวณอื่นได้ทันที", exportButton: "ดาวน์โหลด CSV", exportIncludes: "ประกอบด้วยคำตอบที่มีคะแนน เวลาตอบ อารมณ์ในชีวิตประจำวัน การเรียนรู้อารมณ์ และการฝึกกับอุปกรณ์", exportReady: "ดาวน์โหลดไฟล์ CSV แล้ว", exportLanguageTitle: "เลือกภาษาของตารางข้อมูล", exportLanguageText: "หัวตารางและคำตอบที่อ่านได้จะแสดงเป็นภาษาที่เลือก", exportEnglish: "Download in English", exportThai: "ดาวน์โหลดภาษาไทย", exportCancel: "ยกเลิก", adultAccount: "การบันทึกความก้าวหน้า", account: "บัญชี", signIn: "เข้าสู่ระบบหรือสร้างบัญชี", signInProvider: "เข้าสู่ระบบด้วย Google", setupRequired: "ยังไม่ได้ตั้งค่าบัญชีออนไลน์", signInText: "ผู้ปกครอง ครู หรือนักบำบัดสามารถเข้าสู่ระบบเพื่อบันทึกข้อมูลบนคลาวด์และใช้ข้ามอุปกรณ์", syncAcross: "เลือกวิธีบันทึกความก้าวหน้า", syncAcrossText: "ผู้เยี่ยมชมสามารถบันทึกโปรไฟล์และผลกิจกรรมออนไลน์โดยไม่ใช้อีเมล หรือเข้าสู่บัญชีผู้ใหญ่เพื่อใช้ข้ามอุปกรณ์", signedInAs: "เข้าสู่ระบบในชื่อ", tracking: "กำลังบันทึกให้", syncedAcross: "ทุกกิจกรรมที่ทำเสร็จจะบันทึกออนไลน์ในโปรไฟล์นี้และเปิดดูได้จากอุปกรณ์อื่น", childProfile: "โปรไฟล์เด็ก", selectedChild: "โปรไฟล์ที่เลือก", switchChild: "เปลี่ยนโปรไฟล์เด็ก", manageChild: "จัดการโปรไฟล์", profileOptions: "ตัวเลือกโปรไฟล์", addChild: "เพิ่มโปรไฟล์เด็ก", nickname: "ชื่อเล่นของเด็ก", nicknameHint: "ใช้ชื่อเล่นเท่านั้น ไม่ควรกรอกชื่อ-นามสกุลจริง", create: "สร้างโปรไฟล์", createFirst: "สร้างโปรไฟล์เด็กคนแรก", signOut: "ออกจากระบบ", cloudPrivate: "จัดเก็บอย่างเป็นส่วนตัวในบัญชี", accountRequired: "เลือกใช้แบบผู้เยี่ยมชมหรือเข้าสู่ระบบ", accountRequiredText: "โปรไฟล์และผลกิจกรรมผู้เยี่ยมชมบันทึกในบัญชีส่วนตัว โดยเบราว์เซอร์นี้เก็บสิทธิ์เข้าถึงบัญชี", guestButton: "ใช้แบบผู้เยี่ยมชม", guestName: "โปรไฟล์ผู้เยี่ยมชม", guestLocal: "บันทึกบนคลาวด์สำหรับผู้เยี่ยมชม", guestDeviceOnly: "โปรไฟล์และผลกิจกรรมซิงค์กับ Firebase การล้างข้อมูลเบราว์เซอร์อาจทำให้ไม่สามารถเข้าถึงบัญชีผู้เยี่ยมชมเดิมได้", signInCloud: "เข้าสู่ระบบเพื่อบันทึกบนคลาวด์", deleteGuest: "ลบโปรไฟล์ผู้เยี่ยมชมทั้งหมด", deleteGuestConfirm: "ลบโปรไฟล์และผลกิจกรรมทั้งหมดจากบัญชีผู้เยี่ยมชมและเบราว์เซอร์นี้หรือไม่ การดำเนินการนี้ย้อนกลับไม่ได้", syncError: "ไม่สามารถเชื่อมต่อบัญชีออนไลน์ได้ กิจกรรมบนคลาวด์ไม่ได้ถูกบันทึก", deleteChild: "ลบโปรไฟล์และข้อมูล", deleteConfirm: "ลบโปรไฟล์เด็กนี้และประวัติกิจกรรมทั้งหมดอย่างถาวรหรือไม่ การดำเนินการนี้ย้อนกลับไม่ได้", consent: "ฉันเป็นผู้ใหญ่ที่รับผิดชอบเด็กคนนี้และยินยอมให้จัดเก็บชื่อเล่นและประวัติกิจกรรมทางออนไลน์", privacy: "ความเป็นส่วนตัวและการใช้ข้อมูล", intensityTitle: "ความรู้สึกนี้แรงแค่ไหน?", supportTitle: "อะไรอาจช่วยได้?", intensities: ["เล็กน้อย", "ปานกลาง", "มาก"], supports: ["อยู่ในที่เงียบ", "คุยกับใครสักคน", "ขอความช่วยเหลือ", "ลองอีกครั้ง"], saveReflection: "บันทึกและดูสถานการณ์ถัดไป", category: "ประเภทสถานการณ์", categories: { home: "ที่บ้าน", school: "โรงเรียน", friends: "เพื่อน", change: "การเปลี่ยนแปลง", sensory: "สิ่งกระตุ้นรอบตัว", achievement: "ความสำเร็จ" },
     authSignInTitle: "เข้าสู่ระบบสำหรับผู้ใหญ่", authCreateTitle: "สร้างบัญชีผู้ใหญ่", authIntro: "เข้าสู่ระบบเพื่อเก็บประวัติกิจกรรมของเด็กแต่ละคนอย่างเป็นส่วนตัวและเปิดดูได้จากทุกอุปกรณ์", authGoogle: "ดำเนินการต่อด้วย Google", authOr: "หรือใช้อีเมล", authEmail: "อีเมล", authPassword: "รหัสผ่าน", authConfirm: "ยืนยันรหัสผ่าน", authEmailSignIn: "เข้าสู่ระบบด้วยอีเมล", authCreate: "สร้างบัญชี", authNeedAccount: "ยังไม่มีบัญชี Emotion Sync?", authHaveAccount: "มีบัญชีอยู่แล้ว?", authCreateLink: "สร้างบัญชี", authSignInLink: "เข้าสู่ระบบ", authForgot: "ลืมรหัสผ่าน?", authResetSent: "ส่งอีเมลรีเซ็ตรหัสผ่านแล้ว กรุณาตรวจสอบกล่องจดหมาย", authEnterEmail: "กรุณากรอกอีเมลก่อน", authMismatch: "รหัสผ่านทั้งสองช่องไม่ตรงกัน", authInvalid: "อีเมลหรือรหัสผ่านไม่ถูกต้อง", authEmailUsed: "มีบัญชีที่ใช้อีเมลนี้อยู่แล้ว", authWeak: "กรุณาใช้รหัสผ่านอย่างน้อย 6 ตัวอักษร", authDomain: "ยังต้องเพิ่มเว็บไซต์นี้ใน Authorized domains ของ Firebase", authGeneric: "ไม่สามารถเข้าสู่ระบบได้ กรุณาลองอีกครั้ง", authClose: "ปิดหน้าต่างเข้าสู่ระบบ",
     learnTitle: "เรียนรู้อารมณ์ 4 แบบ", hear: "ฟังเสียง", mightFeel: "เราอาจรู้สึกอย่างไร?", reflection: "ความรู้สึกแบบนี้เกิดขึ้นได้", reflectionText: "แต่ละคนอาจรู้สึกไม่เหมือนกันในสถานการณ์เดียวกัน สิ่งสำคัญคือการสังเกตและบอกความรู้สึกของตัวเอง", another: "สถานการณ์ถัดไป",
     pressStart: "กด Start", which: "ใบหน้านี้แสดงอารมณ์อะไร?", startHint: "พร้อมเมื่อไหร่ กด Start เพื่อเริ่มรอบใหม่ได้เลย", audioError: "ไม่สามารถเล่นเสียงได้ กรุณาลองอีกครั้ง",
@@ -590,6 +591,17 @@ export default function EmotionSyncOnlinePage() {
         setActiveChildId(guestHistory !== null ? guestProfile.id : "");
         setHistory(guestHistory || []);
         setProfileComposerOpen(false);
+        if (guestCloudEnabled()) {
+          setAccountBusy(true);
+          void startGuestCloud().then((cache) => {
+            if (disposed || request !== accountRequest) return;
+            applyGuestCache(cache); setSaveState("saved"); setCloudError(false);
+          }).catch(() => {
+            if (disposed || request !== accountRequest) return;
+            let cache: GuestCache | null = null; try { cache = readGuestCache(); } catch { /* Keep original storage for recovery. */ } if (cache) applyGuestCache(cache);
+            setCloudError(true); setSaveState("error");
+          }).finally(() => { if (!disposed && request === accountRequest) setAccountBusy(false); });
+        }
         return;
       }
       setAuthState("authenticated");
@@ -640,7 +652,7 @@ export default function EmotionSyncOnlinePage() {
   }, [view]);
 
   useEffect(() => {
-    if (!adultId || !activeChildId || authState !== "authenticated") return;
+    if (guestMode || !adultId || !activeChildId || authState !== "authenticated") return;
     let cancelled = false;
     queueMicrotask(() => {
       if (cancelled) return;
@@ -657,7 +669,23 @@ export default function EmotionSyncOnlinePage() {
       .catch(() => { if (!cancelled) setCloudError(true); })
       .finally(() => { if (!cancelled) setHistoryLoading(false); });
     return () => { cancelled = true; };
-  }, [activeChildId, adultId, authState]);
+  }, [activeChildId, adultId, authState, guestMode]);
+
+  useEffect(() => {
+    if (!guestMode || !adultId || !activeChildId) return;
+    const cache = readGuestCache();
+    if (cache?.uid === adultId) setHistory((cache.history[activeChildId] || []) as unknown as SavedSession[]);
+  }, [guestMode, adultId, activeChildId]);
+
+  useEffect(() => {
+    if (!guestMode || !adultId) return;
+    let cancelled = false;
+    const retry = () => { void syncGuestCloud().then((cache) => {
+      if (cancelled) return; applyGuestCache(cache, activeChildId); setSaveState("saved"); setCloudError(false);
+    }).catch(() => { if (!cancelled) { setSaveState("error"); setCloudError(true); } }); };
+    window.addEventListener("online", retry);
+    return () => { cancelled = true; window.removeEventListener("online", retry); };
+  }, [guestMode, adultId, activeChildId]);
 
   useEffect(() => {
     if (!("speechSynthesis" in window)) return;
@@ -740,13 +768,17 @@ export default function EmotionSyncOnlinePage() {
 
   const recordActivity = (saved: SavedSession) => {
     if (guestMode && activeChildId) {
-      const next = [saved, ...history.filter((event) => event.id !== saved.id)];
-      setHistory(next);
-      try {
-        writeGuestHistory(next);
-        setSaveState("saved");
-      } catch { setSaveState("error"); }
-      setCloudError(false);
+      setHistory((current) => [saved, ...current.filter((event) => event.id !== saved.id)]);
+      if (!adultId) {
+        try { writeGuestHistory([saved, ...history.filter((event) => event.id !== saved.id)]); setSaveState("idle"); }
+        catch { setSaveState("error"); }
+        return;
+      }
+      setSaveState("saving");
+      void queueGuestEvent(activeChildId, saved as unknown as GuestEvent)
+        .then(() => syncGuestCloud())
+        .then(() => { setSaveState("saved"); setCloudError(false); })
+        .catch(() => { setSaveState("error"); setCloudError(true); });
       return;
     }
     if (!adultId || !activeChildId || authState !== "authenticated") {
@@ -777,7 +809,9 @@ export default function EmotionSyncOnlinePage() {
     setCloudError(false);
     try {
       if (!adultId) throw new Error("account");
-      const profile = await createFirebaseChild(adultId, newNickname);
+      const cache = guestMode ? await addGuestProfile(newNickname) : null;
+      const profile = cache ? cache.profiles[cache.profiles.length - 1] : await createFirebaseChild(adultId, newNickname);
+      if (cache) void syncGuestCloud().then(() => { setSaveState("saved"); setCloudError(false); }).catch(() => { setSaveState("error"); setCloudError(true); });
       setProfiles((current) => [...current, profile]);
       setActiveChildId(profile.id);
       setNewNickname("");
@@ -795,7 +829,8 @@ export default function EmotionSyncOnlinePage() {
     setAccountBusy(true);
     setCloudError(false);
     try {
-      await deleteFirebaseChild(adultId, activeProfile.id);
+      if (guestMode) await removeGuestProfiles([activeProfile.id]);
+      else await deleteFirebaseChild(adultId, activeProfile.id);
       const remaining = profiles.filter((profile) => profile.id !== activeProfile.id);
       setProfiles(remaining);
       setActiveChildId(remaining[0]?.id || "");
@@ -822,6 +857,7 @@ export default function EmotionSyncOnlinePage() {
   };
 
   const openAuth = () => {
+    if (accountBusy) return;
     if (!firebaseConfigured) return;
     setAuthMode("signin");
     setAuthPassword("");
@@ -896,29 +932,33 @@ export default function EmotionSyncOnlinePage() {
     }
   };
 
-  const startGuestMode = () => {
-    const storedHistory = readGuestHistory() || [];
-    const guestProfile = getGuestProfile();
-    let saved = true;
-    try { writeGuestHistory(storedHistory); } catch { saved = false; }
-    setGuestMode(true);
-    setProfiles([guestProfile]);
-    setActiveChildId(guestProfile.id);
-    setHistory(storedHistory);
-    setSaveState(saved ? (storedHistory.length ? "saved" : "idle") : "error");
-    setCloudError(false);
+  function applyGuestCache(cache: GuestCache, preferred = "") {
+    const childId = cache.profiles.some((p) => p.id === preferred) ? preferred : cache.profiles[0]?.id || "";
+    setGuestMode(true); setAuthState("authenticated"); setAdultId(cache.uid); setAdultName("");
+    setProfiles(cache.profiles); setActiveChildId(childId);
+    setHistory((cache.history[childId] || []) as unknown as SavedSession[]);
+    setProfileComposerOpen(!cache.profiles.length);
+  }
+
+  const startGuestMode = async () => {
+    if (!guestCloudEnabled() && !window.confirm(language === "th"
+      ? "ระบบจะบันทึกชื่อเล่นและประวัติกิจกรรม รวมถึงข้อมูลเดิมในเบราว์เซอร์ ไปยังบัญชีผู้เยี่ยมชมส่วนตัวบน Firebase คุณเป็นผู้ใหญ่ที่รับผิดชอบและยินยอมหรือไม่?"
+      : "Guest profiles and activity history, including existing browser progress, will be saved privately in Firebase. Are you the responsible adult and do you agree?")) return false;
+    setAccountBusy(true); setCloudError(false); setSaveState("saving");
+    try { applyGuestCache(await startGuestCloud()); setSaveState("saved"); return true; }
+    catch { let cache: GuestCache | null = null; try { cache = readGuestCache(); } catch { /* Keep original storage for recovery. */ } if (cache) applyGuestCache(cache); setCloudError(true); setSaveState("error"); return false; }
+    finally { setAccountBusy(false); }
   };
 
-  const deleteGuestHistory = () => {
+  const deleteGuestHistory = async () => {
     if (!window.confirm(c.deleteGuestConfirm)) return;
-    window.localStorage.removeItem(guestStorageKey);
-    setGuestMode(false);
-    setProfiles([]);
-    setActiveChildId("");
-    setHistory([]);
-    setLearnedThisVisit([]);
-    setSaveState("idle");
-    setView("home");
+    setAccountBusy(true);
+    try {
+      if (adultId) applyGuestCache(await removeGuestProfiles(profiles.map((p) => p.id)));
+      else { window.localStorage.removeItem(guestStorageKey); setGuestMode(false); setProfiles([]); setActiveChildId(""); setHistory([]); }
+      setSaveState("idle"); setCloudError(false); setView("home");
+    } catch { setCloudError(true); setSaveState("error"); }
+    finally { setAccountBusy(false); }
   };
 
   const requestTrackingAccount = () => {
@@ -932,9 +972,10 @@ export default function EmotionSyncOnlinePage() {
     }
   };
 
-  const startSession = (kind: SessionKind, activity?: ActivityId) => {
+  const startSession = async (kind: SessionKind, activity?: ActivityId) => {
+    if (accountBusy || authState === "loading") return;
     if (!activeChildId && (authState === "anonymous" || authState === "unconfigured")) {
-      startGuestMode();
+      if (!await startGuestMode()) return;
     } else if ((!guestMode && authState !== "authenticated") || !activeChildId) {
       requestTrackingAccount();
       return;
@@ -995,9 +1036,10 @@ export default function EmotionSyncOnlinePage() {
     setQuestionStarted(nowMs());
   };
 
-  const openEveryday = () => {
+  const openEveryday = async () => {
+    if (accountBusy || authState === "loading") return;
     if (!activeChildId && (authState === "anonymous" || authState === "unconfigured")) {
-      startGuestMode();
+      if (!await startGuestMode()) return;
     } else if ((!guestMode && authState !== "authenticated") || !activeChildId) {
       requestTrackingAccount();
       return;
@@ -1193,9 +1235,10 @@ export default function EmotionSyncOnlinePage() {
     window.setTimeout(() => setExportNotice(false), 3000);
   };
 
-  const openTrackedView = (nextView: "guided-menu" | "learn" | "device") => {
+  const openTrackedView = async (nextView: "guided-menu" | "learn" | "device") => {
+    if (accountBusy || authState === "loading") return;
     if (!activeChildId && (authState === "anonymous" || authState === "unconfigured")) {
-      startGuestMode();
+      if (!await startGuestMode()) return;
     } else if ((!guestMode && authState !== "authenticated") || !activeChildId) {
       requestTrackingAccount();
       return;
@@ -1203,6 +1246,7 @@ export default function EmotionSyncOnlinePage() {
     setView(nextView);
   };
 
+  const guestStatus = !adultId ? (language === "th" ? "ข้อมูลยังอยู่ในเบราว์เซอร์" : "Existing progress is still in this browser") : saveState === "saving" ? c.savingActivity : saveState === "error" ? (language === "th" ? "ยังไม่ซิงค์ — เก็บข้อมูลในเบราว์เซอร์ไว้ก่อน และลองซิงค์อีกครั้ง" : "Not synced — keep this browser's data and retry") : c.saveStatus;
   const renderAccountHub = (compact = false) => (
     <section className={`v2-account-hub${compact ? " is-compact" : ""}${activeProfile ? " is-ready" : ""}`}>
       <div className="v2-account-hub-main">
@@ -1213,10 +1257,10 @@ export default function EmotionSyncOnlinePage() {
           {authState === "unconfigured" && !guestMode && <><h2>{c.setupRequired}</h2><p>{c.syncAcrossText}</p></>}
           {authState === "anonymous" && !guestMode && <><h2>{c.syncAcross}</h2><p>{c.syncAcrossText}</p></>}
           {guestMode && <><h2>{c.guestName}</h2><p>{c.guestDeviceOnly}</p></>}
-          {authState === "authenticated" && !activeProfile && <><h2>{c.createFirst}</h2><p>{c.accountRequiredText}</p></>}
-          {authState === "authenticated" && activeProfile && <><h2>{c.tracking} {activeProfile.nickname}</h2><p>{c.syncedAcross}</p></>}
+          {authState === "authenticated" && !guestMode && !activeProfile && <><h2>{c.createFirst}</h2><p>{c.accountRequiredText}</p></>}
+          {authState === "authenticated" && !guestMode && activeProfile && <><h2>{c.tracking} {activeProfile.nickname}</h2><p>{c.syncedAcross}</p></>}
         </div>
-        {activeProfile && <span className={`v2-cloud-badge${guestMode ? " is-local" : ""}`}><i aria-hidden="true">●</i>{guestMode ? c.guestLocal : saveState === "saving" ? c.savingActivity : c.cloudPrivate}</span>}
+        {activeProfile && <span className={`v2-cloud-badge${guestMode ? " is-local" : ""}`}><i aria-hidden="true">●</i>{guestMode ? guestStatus : saveState === "saving" ? c.savingActivity : c.cloudPrivate}</span>}
       </div>
 
       {(authState === "anonymous" || authState === "unconfigured") && !guestMode && (
@@ -1225,7 +1269,7 @@ export default function EmotionSyncOnlinePage() {
             <span><i>✓</i>{c.guestLocal}</span><span><i>✓</i>{c.openReport}</span><span><i>✓</i>{c.exportButton}</span>
           </div>
           <div className="v2-account-choice-actions">
-            <button className="button button-yellow v2-account-guest" type="button" onClick={startGuestMode}>{c.guestButton}<span>→</span></button>
+            <button className="button button-yellow v2-account-guest" type="button" disabled={accountBusy} onClick={startGuestMode}>{accountBusy ? "…" : c.guestButton}<span>→</span></button>
             <button className="button button-blue v2-account-primary" type="button" disabled={accountBusy || !firebaseConfigured} onClick={openAuth}>{authState === "unconfigured" ? c.setupRequired : c.signInCloud}<span>→</span></button>
           </div>
         </div>
@@ -1234,13 +1278,11 @@ export default function EmotionSyncOnlinePage() {
       {(authState === "authenticated" || guestMode) && activeProfile && (
         <div className="v2-active-profile">
           <div className="v2-profile-avatar" aria-hidden="true">{guestMode ? "G" : activeProfile.nickname.slice(0, 1).toUpperCase()}</div>
-          <div className="v2-active-profile-name"><small>{c.selectedChild}</small><strong>{guestMode ? c.guestName : activeProfile.nickname}</strong><span>✓ {guestMode ? c.guestLocal : c.saveStatus}</span></div>
-          {guestMode ? <div className="v2-profile-select v2-guest-storage-note"><span>{c.guestLocal}</span><strong>{c.guestDeviceOnly}</strong></div> : (
-            <label className="v2-profile-select"><span>{c.switchChild}</span><select value={activeChildId} onChange={(event) => { setActiveChildId(event.target.value); setLearnedThisVisit([]); setSaveState("idle"); setProfileMenuOpen(false); }}>{profiles.map((profile) => <option value={profile.id} key={profile.id}>{profile.nickname}</option>)}</select></label>
-          )}
+          <div className="v2-active-profile-name"><small>{c.selectedChild}</small><strong>{activeProfile.nickname}</strong><span>✓ {guestMode ? guestStatus : c.saveStatus}</span></div>
+          <label className="v2-profile-select"><span>{c.switchChild}</span><select value={activeChildId} onChange={(event) => { setActiveChildId(event.target.value); setLearnedThisVisit([]); setProfileMenuOpen(false); }}>{profiles.map((profile) => <option value={profile.id} key={profile.id}>{profile.nickname}</option>)}</select></label>
           <div className="v2-profile-actions">
             <button className="v2-profile-progress" type="button" onClick={() => setView("progress")}>{c.openReport}<span>→</span></button>
-            {guestMode ? <button className="v2-profile-manage-trigger" type="button" onClick={openAuth}><span aria-hidden="true">↗</span>{c.signInCloud}</button> : (
+            {adultId && (
               <div className="v2-profile-manage">
                 <button ref={profileMenuTriggerRef} className="v2-profile-manage-trigger" type="button" aria-haspopup="menu" aria-expanded={profileMenuOpen} aria-controls="profile-management-actions" onClick={() => setProfileMenuOpen((open) => !open)}><span aria-hidden="true">•••</span>{c.manageChild}</button>
                 {profileMenuOpen && createPortal(
@@ -1265,9 +1307,9 @@ export default function EmotionSyncOnlinePage() {
         </form>
       )}
 
-      {authState === "authenticated" && <div className="v2-account-footer"><span>{c.signedInAs} <strong>{adultName}</strong></span><div><a href={`/privacy?lang=${language}`}>{c.privacy}</a><button type="button" disabled={accountBusy} onClick={handleAdultSignOut}>{c.signOut}</button></div></div>}
-      {guestMode && <div className="v2-account-footer"><span>{c.guestDeviceOnly}</span><div><a href={`/privacy?lang=${language}`}>{c.privacy}</a><button className="is-danger" type="button" onClick={deleteGuestHistory}>{c.deleteGuest}</button></div></div>}
-      {cloudError && authState === "authenticated" && <p className="v2-cloud-error" role="alert">{saveState === "error" ? c.saveFailed : c.syncError}</p>}
+      {authState === "authenticated" && !guestMode && <div className="v2-account-footer"><span>{c.signedInAs} <strong>{adultName}</strong></span><div><a href={`/privacy?lang=${language}`}>{c.privacy}</a><button type="button" disabled={accountBusy} onClick={handleAdultSignOut}>{c.signOut}</button></div></div>}
+      {guestMode && <div className="v2-account-footer"><span>{adultId ? `Guest UID: ${adultId}` : guestStatus}</span><div><button type="button" disabled={accountBusy} onClick={startGuestMode}>{adultId ? (language === "th" ? "ลองซิงค์อีกครั้ง" : "Retry sync") : (language === "th" ? "บันทึกข้อมูลเดิมบนคลาวด์" : "Save existing progress online")}</button><button type="button" onClick={openAuth}>{c.signIn}</button><a href={`/privacy?lang=${language}`}>{c.privacy}</a><button className="is-danger" type="button" disabled={accountBusy} onClick={deleteGuestHistory}>{c.deleteGuest}</button></div></div>}
+      {cloudError && <p className="v2-cloud-error" role="alert">{guestMode ? guestStatus : c.syncError}</p>}
     </section>
   );
 
@@ -1304,18 +1346,18 @@ export default function EmotionSyncOnlinePage() {
           <div className="v2-primary-grid">
             <button className={`v2-path-card is-guided${!activeProfile ? " is-locked" : ""}`} type="button" onClick={() => openTrackedView("guided-menu")}>
               <div className="v2-path-visual v2-face-collage" aria-hidden="true"><img src="/v2-faces-hd/happy-2.webp" alt="" /><img src="/v2-faces-hd/calm-4.webp" alt="" /><img src="/v2-faces-hd/angry-3.webp" alt="" /></div>
-              <span className="v2-card-number">01</span><small>{c.guidedLabel}</small><h3>{c.guided}</h3><p>{c.guidedText}</p><b>{c.start} →</b>
+              <span className="v2-card-number">01</span><small>{c.guidedLabel}</small><h3>{c.guided}</h3><p>{c.guidedText}</p><b className="activity-start"><span aria-hidden="true">▶</span> {c.start}</b>
             </button>
             <button className={`v2-path-card is-check${!activeProfile ? " is-locked" : ""}`} type="button" onClick={() => startSession("check")}>
               <div className="v2-path-visual v2-check-visual" aria-hidden="true"><div><strong>16</strong><span>{c.questions}</span></div><span className="dot-red" /><span className="dot-yellow" /><span className="dot-blue" /><span className="dot-black" /></div>
-              <span className="v2-card-number">02</span><small>{c.checkLabel}</small><h3>{c.check}</h3><p>{c.checkText}</p><b>{c.start} →</b>
+              <span className="v2-card-number">02</span><small>{c.checkLabel}</small><h3>{c.check}</h3><p>{c.checkText}</p><b className="activity-start"><span aria-hidden="true">▶</span> {c.start}</b>
             </button>
           </div>
           <button className="v2-report-entry" type="button" onClick={() => setView("progress")}>
             <span>↗</span><div><small>{history.length ? `${history.length} ${c.totalSessions}` : c.report}</small><h3>{c.progress}</h3><p>{c.progressText}</p></div><b>{c.openReport} →</b>
           </button>
           <div className="v2-secondary-grid">
-            <button type="button" className={!activeProfile ? "is-locked" : ""} onClick={() => openTrackedView("learn")}><div className="v2-secondary-art is-emotions" aria-hidden="true">{emotions.map((emotion) => <span className={`dot-${emotion.color}`} key={emotion.id}>{emotion.face}</span>)}</div><div><h3>{c.explore}</h3><p>{c.exploreText}</p></div><b>→</b></button>
+            <button type="button" className={!activeProfile ? "is-locked" : ""} onClick={() => openTrackedView("learn")}><div className="v2-secondary-art is-emotions" aria-hidden="true">{emotions.map((emotion) => <span className={`dot-${emotion.color}`} key={emotion.id}><EmotionFace emotion={emotion.id} /></span>)}</div><div><h3>{c.explore}</h3><p>{c.exploreText}</p></div><b>→</b></button>
             <button type="button" className={!activeProfile ? "is-locked" : ""} onClick={openEveryday}><div className="v2-secondary-art is-scenes" aria-hidden="true"><img src="/everyday-scenes/tower.webp" alt="" /><img src="/everyday-scenes/drawing.webp" alt="" /></div><div><h3>{c.everyday}</h3><p>{c.everydayText}</p><small>{c.unscoredLabel}</small></div><b>→</b></button>
             <button type="button" className={!activeProfile ? "is-locked" : ""} onClick={() => openTrackedView("device")}><div className="v2-secondary-art is-device" aria-hidden="true"><img src="/emotion-sync-hero.png" alt="" /></div><div><h3>{c.device}</h3><p>{c.deviceText}</p></div><b>→</b></button>
           </div>
@@ -1329,7 +1371,13 @@ export default function EmotionSyncOnlinePage() {
           <div className="v2-activity-grid">
             {activityOrder.map((activity, index) => (
               <button type="button" key={activity} onClick={() => startSession("guided", activity)}>
-                <span>{String(index + 1).padStart(2, "0")}</span><h3>{c.activities[activity].title}</h3><p>{c.activities[activity].text}</p><small>8 {c.questions}</small><b>{c.start} →</b>
+                <div className={`guided-art guided-art-${activity}`} aria-hidden="true">
+                  {activity === "faces" && <><img src="/v2-faces-hd/happy-2.webp" alt="" /><img src="/v2-faces-hd/calm-4.webp" alt="" /><img src="/v2-faces-hd/angry-3.webp" alt="" /></>}
+                  {activity === "listen" && <><span className="guided-audio-symbol">◖))</span><EmotionFace emotion="happy" /><EmotionFace emotion="sad" /></>}
+                  {activity === "situations" && <><img src="/everyday-scenes/tower.webp" alt="" /><img src="/everyday-scenes/drawing.webp" alt="" /></>}
+                  {activity === "match" && <><img src="/v2-faces-hd/happy-2.webp" alt="" /><span className="guided-match-symbol">=</span><img src="/v2-faces-hd/happy-4.webp" alt="" /></>}
+                </div>
+                <span>{String(index + 1).padStart(2, "0")}</span><h3>{c.activities[activity].title}</h3><p>{c.activities[activity].text}</p><small>8 {c.questions}</small><b className="activity-start"><span aria-hidden="true">▶</span> {c.start}</b>
               </button>
             ))}
           </div>
@@ -1349,7 +1397,7 @@ export default function EmotionSyncOnlinePage() {
               <><h2>{c.facePrompt}</h2><FaceTile face={question.face as FaceRef} className="is-large" label="Facial expression practice image" />{answerButtons()}</>
             )}
             {question.activity === "listen" && (
-              <><h2>{c.listenPrompt}</h2><button className="v2-audio-orb" type="button" onClick={() => speakEmotion(question.emotion)}><span>◖))</span>{selected ? c.playAgain : c.play}</button>{audioError && <small className="online-audio-error">{c.audioError}</small>}<div className="v2-emoji-options">{emotions.map((emotion) => <button type="button" key={emotion.id} disabled={sessionKind === "check" && Boolean(selected)} className={selected === emotion.id ? "is-selected" : ""} onClick={() => chooseAnswer(emotion.id)}><span>{emotion.face}</span><small className="sr-only">{emotionName(emotion.id, language)}</small></button>)}</div></>
+              <><h2>{c.listenPrompt}</h2><button className="v2-audio-orb" type="button" onClick={() => speakEmotion(question.emotion)}><span>◖))</span>{selected ? c.playAgain : c.play}</button>{audioError && <small className="online-audio-error">{c.audioError}</small>}<div className="v2-emoji-options">{emotions.map((emotion) => <button type="button" key={emotion.id} disabled={sessionKind === "check" && Boolean(selected)} className={selected === emotion.id ? "is-selected" : ""} onClick={() => chooseAnswer(emotion.id)}><span><EmotionFace emotion={emotion.id} /></span><small className="sr-only">{emotionName(emotion.id, language)}</small></button>)}</div></>
             )}
             {question.activity === "situations" && (
               <><h2>{c.storyPrompt}</h2><div className="v2-story-prompt"><span>“</span><div><p>{language === "th" ? question.story?.th : question.story?.en}</p><button className="v2-story-audio" type="button" onClick={() => speakText(language === "th" ? question.story?.th || "" : question.story?.en || "")}><span aria-hidden="true">◖))</span>{selected ? c.listenStoryAgain : c.listenStory}</button></div></div>{audioError && <small className="online-audio-error">{c.audioError}</small>}{answerButtons()}</>
@@ -1392,7 +1440,7 @@ export default function EmotionSyncOnlinePage() {
           <button className="v2-back-button" type="button" onClick={openHome}>← {c.backHome}</button>
           <p className="eyebrow">{c.progress}</p><h2>{c.report}</h2><p className="v2-results-intro">{c.reportIntro}</p>
           {renderAccountHub(true)}
-          {activeProfile && <div className={`v2-save-status${guestMode ? " is-local" : " is-cloud"}${saveState === "error" ? " is-error" : ""}`} role="status"><span aria-hidden="true">●</span><div><strong>{guestMode ? (saveState === "error" ? (language === "th" ? "บันทึกในเบราว์เซอร์ไม่สำเร็จ กรุณาดาวน์โหลด CSV เพื่อเก็บข้อมูล" : "Could not save in this browser. Download CSV to keep this progress.") : `${c.guestLocal} · ${c.guestName}`) : saveState === "saving" ? c.savingActivity : saveState === "error" ? c.saveFailed : `${c.saveStatus} · ${activeProfile.nickname}`}</strong><p>{c.reportNotice}</p></div></div>}
+          {activeProfile && <div className={`v2-save-status${guestMode ? " is-local" : " is-cloud"}${saveState === "error" ? " is-error" : ""}`} role="status"><span aria-hidden="true">●</span><div><strong>{guestMode ? guestStatus : saveState === "saving" ? c.savingActivity : saveState === "error" ? c.saveFailed : `${c.saveStatus} · ${activeProfile.nickname}`}</strong><p>{c.reportNotice}</p></div></div>}
           {activeProfile && (
             <section className="v2-export-panel" aria-labelledby="progress-export-title">
               <span className="v2-export-icon" aria-hidden="true">↓</span>
@@ -1522,15 +1570,15 @@ export default function EmotionSyncOnlinePage() {
       )}
 
       {view === "learn" && (
-        <section className="v2-shell"><button className="v2-back-button" type="button" onClick={openHome}>← {c.backHome}</button><div className="v2-section-heading"><h2>{c.learnTitle}</h2></div><div className="online-emotion-grid">{emotions.map((emotion) => <article className={`online-emotion-card emotion-${emotion.color}`} key={emotion.id}><span className="online-face" aria-hidden="true">{emotion.face}</span><h3>{emotionName(emotion.id, language)}</h3><p>{language === "th" ? emotion.learnTh : emotion.learnEn}</p><button type="button" onClick={() => exploreEmotion(emotion.id)}><span aria-hidden="true">◖))</span> {c.hear}</button></article>)}</div>{audioError && <small className="online-audio-error">{c.audioError}</small>}</section>
+        <section className="v2-shell"><button className="v2-back-button" type="button" onClick={openHome}>← {c.backHome}</button><div className="v2-section-heading"><h2>{c.learnTitle}</h2></div><div className="online-emotion-grid">{emotions.map((emotion) => <article className={`online-emotion-card emotion-${emotion.color}`} key={emotion.id}><span className="online-face" aria-hidden="true"><EmotionFace emotion={emotion.id} /></span><h3>{emotionName(emotion.id, language)}</h3><p>{language === "th" ? emotion.learnTh : emotion.learnEn}</p><button type="button" onClick={() => exploreEmotion(emotion.id)}><span aria-hidden="true">◖))</span> {c.hear}</button></article>)}</div>{audioError && <small className="online-audio-error">{c.audioError}</small>}</section>
       )}
 
       {view === "everyday" && (
-        <section className="v2-shell"><button className="v2-back-button" type="button" onClick={openHome}>← {c.backHome}</button><div className="v2-section-heading"><h2>{c.everyday}</h2><p>{c.everydayText}</p></div><div className="online-situation-card"><div className={`online-situation-visual category-${everyday.category}`}>{everyday.image ? <img src={everyday.image} alt="" width="1254" height="1254" /> : <div className="online-situation-symbol" aria-hidden="true"><i>{everyday.visual}</i><span>{c.categories[everyday.category]}</span></div>}<span>{everydayIndex + 1} / {everydayScenes.length}</span><small>{c.categories[everyday.category]}</small></div><div className="online-situation-copy"><h3>{c.mightFeel}</h3><p className="online-situation-prompt">{language === "th" ? everyday.th : everyday.en}</p>{(language === "en" || everyday.thaiAudio) && <button className="v2-story-audio online-situation-audio" type="button" onClick={() => speakText(language === "th" ? everyday.th : everyday.en, everyday.thaiAudio)}><span aria-hidden="true">◖))</span>{c.listenStory}</button>}{audioError && <small className="online-audio-error">{c.audioError}</small>}<div className="online-feeling-choices">{emotions.map((emotion) => <button type="button" className={everydayAnswer === emotion.id ? "is-selected" : ""} onClick={() => setEverydayAnswer(emotion.id)} key={emotion.id}><span>{emotion.face}</span>{emotionName(emotion.id, language)}</button>)}</div>{everydayAnswer && <div className="v2-reflection-followup"><div><strong>{c.intensityTitle}</strong><div>{(["small", "medium", "big"] as Intensity[]).map((value, index) => <button type="button" className={everydayIntensity === value ? "is-selected" : ""} onClick={() => setEverydayIntensity(value)} key={value}>{c.intensities[index]}</button>)}</div></div><div><strong>{c.supportTitle}</strong><div>{(["space", "talk", "help", "try"] as SupportChoice[]).map((value, index) => <button type="button" className={everydaySupport === value ? "is-selected" : ""} onClick={() => setEverydaySupport(value)} key={value}>{c.supports[index]}</button>)}</div></div><p><b>{c.reflection}</b> {c.reflectionText}</p></div>}<button className="button button-blue online-another" type="button" disabled={!everydayAnswer} onClick={saveEverydayReflection}>{c.saveReflection} →</button></div></div></section>
+        <section className="v2-shell"><button className="v2-back-button" type="button" onClick={openHome}>← {c.backHome}</button><div className="v2-section-heading"><h2>{c.everyday}</h2><p>{c.everydayText}</p></div><div className="online-situation-card"><div className={`online-situation-visual category-${everyday.category}`}>{everyday.image ? <img src={everyday.image} alt="" width="1254" height="1254" /> : <div className="online-situation-symbol" aria-hidden="true"><i>{everyday.visual}</i><span>{c.categories[everyday.category]}</span></div>}<span>{everydayIndex + 1} / {everydayScenes.length}</span><small>{c.categories[everyday.category]}</small></div><div className="online-situation-copy"><h3>{c.mightFeel}</h3><p className="online-situation-prompt">{language === "th" ? everyday.th : everyday.en}</p>{(language === "en" || everyday.thaiAudio) && <button className="v2-story-audio online-situation-audio" type="button" onClick={() => speakText(language === "th" ? everyday.th : everyday.en, everyday.thaiAudio)}><span aria-hidden="true">◖))</span>{c.listenStory}</button>}{audioError && <small className="online-audio-error">{c.audioError}</small>}<div className="online-feeling-choices">{emotions.map((emotion) => <button type="button" className={everydayAnswer === emotion.id ? "is-selected" : ""} onClick={() => setEverydayAnswer(emotion.id)} key={emotion.id}><span><EmotionFace emotion={emotion.id} /></span>{emotionName(emotion.id, language)}</button>)}</div>{everydayAnswer && <div className="v2-reflection-followup"><div><strong>{c.intensityTitle}</strong><div>{(["small", "medium", "big"] as Intensity[]).map((value, index) => <button type="button" className={everydayIntensity === value ? "is-selected" : ""} onClick={() => setEverydayIntensity(value)} key={value}>{c.intensities[index]}</button>)}</div></div><div><strong>{c.supportTitle}</strong><div>{(["space", "talk", "help", "try"] as SupportChoice[]).map((value, index) => <button type="button" className={everydaySupport === value ? "is-selected" : ""} onClick={() => setEverydaySupport(value)} key={value}>{c.supports[index]}</button>)}</div></div><p><b>{c.reflection}</b> {c.reflectionText}</p></div>}<button className="button button-blue online-another" type="button" disabled={!everydayAnswer} onClick={saveEverydayReflection}>{c.saveReflection} →</button></div></div></section>
       )}
 
       {view === "device" && (
-        <section className="v2-shell v2-device-shell"><button className="v2-back-button" type="button" onClick={openHome}>← {c.backHome}</button><div className="v2-section-heading"><h2>{c.device}</h2><p>{c.deviceText}</p></div><div className="v2-device-area"><div className="v2-device-frame"><div className="device-model online-device"><span className="device-label">Emotion Sync · Online</span><div className="speaker"><i /><i /><i /></div><span className={`device-led led-yellow${deviceAnswer && !deviceCorrect ? " is-on" : ""}`} /><span className={`device-led led-green${deviceCorrect ? " is-on" : ""}`} /><button className="side-start-control" type="button" onClick={() => { const pool = emotionOrder.filter((item) => item !== devicePrompt); setDevicePrompt(randomEmotionFrom(pool)); setDeviceAnswer(null); }}><span>Start</span></button><div className="oled"><span className="oled-screw screw-one" /><span className="oled-screw screw-two" /><span className="oled-screw screw-three" /><span className="oled-screw screw-four" /><div className="oled-screen"><b>{devicePrompt ? emotionById(devicePrompt).face : "•  •"}</b><span>{devicePrompt ? c.which : c.pressStart}</span></div></div><div className="prototype-controls">{emotions.map((emotion) => <button type="button" className={`model-button model-${emotion.color}`} key={emotion.id} disabled={!devicePrompt || Boolean(deviceAnswer)} onClick={() => chooseDeviceAnswer(emotion.id)}><span className="sr-only">{emotionName(emotion.id, language)}</span></button>)}</div></div></div><div className="online-feedback"><strong>{!devicePrompt ? c.pressStart : !deviceAnswer ? c.choose : deviceCorrect ? c.correct : c.retry}</strong><span>{!devicePrompt ? c.startHint : deviceCorrect ? c.correctDetail : deviceAnswer ? c.retryDetail : c.which}</span></div></div></section>
+        <section className="v2-shell v2-device-shell"><button className="v2-back-button" type="button" onClick={openHome}>← {c.backHome}</button><div className="v2-section-heading"><h2>{c.device}</h2><p>{c.deviceText}</p></div><div className="v2-device-area"><div className="v2-device-frame"><div className="device-model online-device"><span className="device-label">Emotion Sync · Prototype 03</span><div className="speaker"><i /><i /><i /></div><span className={`device-led led-yellow${deviceAnswer && !deviceCorrect ? " is-on" : ""}`} /><span className={`device-led led-green${deviceCorrect ? " is-on" : ""}`} /><button className="side-start-control" type="button" onClick={() => { const pool = emotionOrder.filter((item) => item !== devicePrompt); setDevicePrompt(randomEmotionFrom(pool)); setDeviceAnswer(null); }}><span>Start</span></button><div className="oled"><span className="oled-screw screw-one" /><span className="oled-screw screw-two" /><span className="oled-screw screw-three" /><span className="oled-screw screw-four" /><div className="oled-screen"><b>{devicePrompt ? <EmotionFace emotion={devicePrompt} /> : <span className="device-ready-symbol" aria-hidden="true">▶</span>}</b><span>{devicePrompt ? c.which : c.pressStart}</span></div></div><div className="prototype-controls">{emotions.map((emotion) => <button type="button" className={`model-button model-${emotion.color}`} key={emotion.id} disabled={!devicePrompt || Boolean(deviceAnswer)} onClick={() => chooseDeviceAnswer(emotion.id)}><span className="sr-only">{emotionName(emotion.id, language)}</span></button>)}</div></div></div><div className="online-feedback"><strong>{!devicePrompt ? c.pressStart : !deviceAnswer ? c.choose : deviceCorrect ? c.correct : c.retry}</strong><span>{!devicePrompt ? c.startHint : deviceCorrect ? c.correctDetail : deviceAnswer ? c.retryDetail : c.which}</span></div></div></section>
       )}
 
       {exportLanguageOpen && (

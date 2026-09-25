@@ -14,6 +14,7 @@ import {
   signInWithPopup,
   signInWithRedirect,
   signOut,
+  signInAnonymously,
   type User,
 } from "firebase/auth";
 import {
@@ -44,6 +45,7 @@ export const firebaseConfigured = Object.values(firebaseConfig).every(Boolean);
 
 let app: FirebaseApp | null = null;
 let appCheckInitialized = false;
+let guestAppCheckInitialized = false;
 
 function getFirebaseApp() {
   if (!firebaseConfigured) throw new Error("Firebase is not configured");
@@ -59,8 +61,13 @@ function getFirebaseApp() {
   return app;
 }
 
-function services() {
-  const firebaseApp = getFirebaseApp();
+function services(guest = false) {
+  const firebaseApp = guest ? (getApps().find((item) => item.name === "plb-guest") || initializeApp(firebaseConfig, "plb-guest")) : getFirebaseApp();
+  const guestSiteKey = process.env.NEXT_PUBLIC_FIREBASE_APP_CHECK_SITE_KEY;
+  if (guest && guestSiteKey && !guestAppCheckInitialized && typeof window !== "undefined") {
+    initializeAppCheck(firebaseApp, { provider: new ReCaptchaV3Provider(guestSiteKey), isTokenAutoRefreshEnabled: true });
+    guestAppCheckInitialized = true;
+  }
   return {
     auth: getAuth(firebaseApp),
     db: getFirestore(firebaseApp),
@@ -165,8 +172,8 @@ export async function registerUniqueBrowser() {
   markBrowserRegistered(id);
 }
 
-export async function loadChildProfiles(uid: string): Promise<FirebaseChildProfile[]> {
-  const { db } = services();
+export async function loadChildProfiles(uid: string, guest = false): Promise<FirebaseChildProfile[]> {
+  const { db } = services(guest);
   const snapshot = await getDocs(query(
     collection(db, "users", uid, "children"),
     orderBy("createdAt", "asc"),
@@ -178,8 +185,8 @@ export async function loadChildProfiles(uid: string): Promise<FirebaseChildProfi
   }));
 }
 
-export async function createFirebaseChild(uid: string, nickname: string): Promise<FirebaseChildProfile> {
-  const { db } = services();
+export async function createFirebaseChild(uid: string, nickname: string, guest = false): Promise<FirebaseChildProfile> {
+  const { db } = services(guest);
   const childRef = doc(collection(db, "users", uid, "children"));
   const profile = {
     id: childRef.id,
@@ -190,8 +197,8 @@ export async function createFirebaseChild(uid: string, nickname: string): Promis
   return profile;
 }
 
-export async function deleteFirebaseChild(uid: string, childId: string) {
-  const { db } = services();
+export async function deleteFirebaseChild(uid: string, childId: string, guest = false) {
+  const { db } = services(guest);
   const events = await getDocs(collection(db, "users", uid, "children", childId, "events"));
   for (let start = 0; start < events.docs.length; start += 400) {
     const batch = writeBatch(db);
@@ -201,8 +208,8 @@ export async function deleteFirebaseChild(uid: string, childId: string) {
   await deleteDoc(doc(db, "users", uid, "children", childId));
 }
 
-export async function loadFirebaseHistory(uid: string, childId: string): Promise<unknown[]> {
-  const { db } = services();
+export async function loadFirebaseHistory(uid: string, childId: string, guest = false): Promise<unknown[]> {
+  const { db } = services(guest);
   const snapshot = await getDocs(query(
     collection(db, "users", uid, "children", childId, "events"),
     orderBy("completedAt", "desc"),
@@ -224,14 +231,14 @@ function fallbackEventId() {
     || `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
 }
 
-export async function saveFirebaseEvent(uid: string, childId: string, event: Record<string, unknown>) {
-  const { db } = services();
+export async function saveFirebaseEvent(uid: string, childId: string, event: Record<string, unknown>, guest = false) {
+  const { db } = services(guest);
   const eventId = String(event.id || fallbackEventId());
   await setDoc(doc(db, "users", uid, "children", childId, "events", eventId), eventDocument(event));
 }
 
-export async function importFirebaseEvents(uid: string, childId: string, events: Record<string, unknown>[]) {
-  const { db } = services();
+export async function importFirebaseEvents(uid: string, childId: string, events: Record<string, unknown>[], guest = false) {
+  const { db } = services(guest);
   for (let start = 0; start < events.length; start += 400) {
     const batch = writeBatch(db);
     events.slice(start, start + 400).forEach((event) => {
@@ -240,5 +247,32 @@ export async function importFirebaseEvents(uid: string, childId: string, events:
     });
     await batch.commit();
   }
-  return loadFirebaseHistory(uid, childId);
+  return loadFirebaseHistory(uid, childId, guest);
+}
+
+// A separate persisted Auth instance keeps the guest identity when an adult signs in/out.
+export async function ensureGuestIdentity() {
+  const { auth, db } = services(true);
+  await setPersistence(auth, browserLocalPersistence);
+  await auth.authStateReady();
+  const user = auth.currentUser || (await signInAnonymously(auth)).user;
+  if (!user.isAnonymous) throw new Error("Unexpected guest identity");
+  await setDoc(doc(db, "users", user.uid), { accountType: "guest", updatedAt: serverTimestamp() }, { merge: true });
+  return user.uid;
+}
+
+export async function saveGuestProfile(uid: string, profile: FirebaseChildProfile) {
+  const { db } = services(true);
+  await setDoc(doc(db, "users", uid, "children", profile.id), {
+    nickname: profile.nickname, createdAt: profile.createdAt,
+  });
+}
+
+export function saveGuestEventBatch(uid: string, childId: string, events: Record<string, unknown>[]) {
+  const { db } = services(true);
+  const batch = writeBatch(db);
+  for (const event of events) {
+    batch.set(doc(db, "users", uid, "children", childId, "events", String(event.id)), eventDocument(event));
+  }
+  return batch.commit();
 }

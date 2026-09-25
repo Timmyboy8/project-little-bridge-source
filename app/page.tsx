@@ -1,4 +1,5 @@
 "use client";
+import EmotionFace from "./EmotionFace";
 
 import { useEffect, useState, type FormEvent } from "react";
 import thailandMap from "@svg-maps/thailand";
@@ -109,25 +110,21 @@ const supportSymbols = ["↔", "♡", "✦", "◎"] as const;
 const emotionChoices = {
   happy: {
     label: "Happy",
-    face: "•‿•",
     title: "That joy matters.",
     message: "Noticing good feelings helps children understand what brings them comfort and confidence.",
   },
   calm: {
     label: "Calm",
-    face: "–‿–",
     title: "Calm is worth noticing, too.",
     message: "Gentle check-ins build a fuller emotional vocabulary, not only during difficult moments.",
   },
   sad: {
     label: "Sad",
-    face: "•︵•",
     title: "It is okay to feel sad.",
     message: "A simple choice can make a difficult feeling easier to name and share with someone trusted.",
   },
   frustrated: {
     label: "Angry",
-    face: ">︵<",
     title: "Big feelings can have words.",
     message: "Naming anger creates a small pause—and a clearer first step toward asking for support.",
   },
@@ -348,7 +345,7 @@ export default function Home() {
   ];
 
   return (
-    <main className={language === "th" ? "lang-th" : undefined}>
+    <main className={`plb-home${language === "th" ? " lang-th" : ""}`}>
       <header className="site-header">
         <a className="brand" href="#top" aria-label={c.a11y.home} onClick={() => setMobileMenuOpen(false)}>
           <span className="brand-mark" aria-hidden="true">
@@ -439,10 +436,10 @@ export default function Home() {
         </div>
       )}
 
-      <section className={`hero hero-${selectedEmotion ?? "idle"}`} id="top">
+      <section className={`hero hero-split hero-${selectedEmotion ?? "idle"}`} id="top">
         <div className="hero-heading">
           <p className="hero-kicker"><span aria-hidden="true" />Project Little Bridge<span aria-hidden="true" /></p>
-          <h1 className="hero-product-title">Emotion Sync<span className="title-spark" aria-hidden="true">✦</span></h1>
+          <h1 className="hero-product-title"><span>Emotion</span><span className="hero-title-highlight">Sync<span className="title-spark" aria-hidden="true">✦</span></span></h1>
           <p className="hero-summary">{c.hero.summary}</p>
           <div className="hero-actions" aria-label={language === "th" ? "การทำงานหลัก" : "Primary actions"}>
             <a className="button button-yellow hero-cta hero-online-cta" href="/emotion-sync-online">
@@ -455,21 +452,10 @@ export default function Home() {
         </div>
 
         <div className="hero-stage">
-          <div
-            className={`emotion-ripples ripples-${selectedEmotion ?? "idle"}`}
-            aria-hidden="true"
-            key={selectedEmotion ?? "idle"}
-          >
-            <span className="emotion-glow" />
-            <span className="emotion-ring ring-one" />
-            <span className="emotion-ring ring-two" />
-            <span className="emotion-ring ring-three" />
-            <span className="emotion-ring ring-four" />
-          </div>
-
+          <div className="hero-device-backdrop" aria-hidden="true" />
           <div className={`device-wrap${selectedEmotion ? " has-selection" : ""}`}>
             <div className="device-model" aria-label={c.hero.modelLabel}>
-              <span className="device-label" aria-hidden="true">Emotion Sync · Prototype 01</span>
+              <span className="device-label" aria-hidden="true">Emotion Sync · Prototype 03</span>
               <div className="speaker" aria-hidden="true"><i /><i /><i /></div>
               <span className={`device-led led-yellow${selectedEmotion && !quizCorrect ? " is-on" : ""}`} aria-hidden="true" />
               <span className={`device-led led-green${selectedEmotion && quizCorrect ? " is-on" : ""}`} aria-hidden="true" />
@@ -494,7 +480,7 @@ export default function Home() {
                 <span className="oled-screw screw-three" aria-hidden="true" />
                 <span className="oled-screw screw-four" aria-hidden="true" />
                 <div className="oled-screen">
-                  <b>{quizPrompt?.face ?? "•  •"}</b>
+                  <b>{quizEmotion ? <EmotionFace emotion={quizEmotion} /> : <span className="device-ready-symbol" aria-hidden="true">▶</span>}</b>
                   <span>
                     {syncComplete
                       ? c.hero.screenSynced
@@ -652,7 +638,7 @@ export default function Home() {
 
               {sessionStep === 1 && (
                 <div className="session-choice-state">
-                  <span className="session-question-emoji">{emotionChoices[sessionTarget].face}</span>
+                  <span className="session-question-emoji"><EmotionFace emotion={sessionTarget} /></span>
                   <strong>{c.session.question}</strong>
                   <div className="session-emotion-buttons" role="group" aria-label={c.hero.groupAria}>
                     {prototypeButtons.map(({ emotion, color }) => (
@@ -663,7 +649,7 @@ export default function Home() {
                         onClick={() => chooseSessionEmotion(emotion)}
                         key={emotion}
                       >
-                        <span>{emotionChoices[emotion].face}</span>
+                        <span><EmotionFace emotion={emotion} /></span>
                         <small>{emotionLabel(emotion)}</small>
                       </button>
                     ))}
@@ -677,7 +663,7 @@ export default function Home() {
                     <span className={`session-demo-led demo-led-yellow${sessionEmotion && !sessionCorrect ? " is-on" : ""}`}><i />{c.session.yellowLight}<small>{c.session.tryAgain}</small></span>
                     <span className={`session-demo-led demo-led-green${sessionEmotion && sessionCorrect ? " is-on" : ""}`}><i />{c.session.greenLight}<small>{c.session.correctSmall}</small></span>
                   </div>
-                  <span className="session-response-face">{emotionChoices[sessionTarget].face}</span>
+                  <span className="session-response-face"><EmotionFace emotion={sessionTarget} /></span>
                   <strong>{!sessionEmotion ? c.session.chooseFirst : sessionCorrect ? c.session.correctAnswer : c.session.notMatch}</strong>
                   <p>{sessionCorrect ? c.session.greenConfirm : sessionEmotion ? c.session.yellowRetry : c.session.returnMatch}</p>
                 </div>
@@ -775,7 +761,7 @@ export default function Home() {
               src="/prototype-front.webp"
               alt={c.a11y.prototypeMain}
             />
-            <span className="photo-stamp" aria-hidden="true">Prototype 01</span>
+            <span className="photo-stamp" aria-hidden="true">Prototype 03</span>
           </div>
           <div className="prototype-photo prototype-photo-controls">
             <img

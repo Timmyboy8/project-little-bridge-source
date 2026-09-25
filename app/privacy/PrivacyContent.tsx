@@ -36,15 +36,15 @@ export default function PrivacyContent() {
       {language === "en" ? (
         <article className="privacy-shell" lang="en">
           <header>
-            <p className="eyebrow">Effective 6 September 2026</p>
+            <p className="eyebrow">Effective 24 September 2026</p>
             <h1>Privacy &amp; data use</h1>
-            <p>Emotion Sync Online is an educational activity created by Project Little Bridge. It can be used as a browser-only guest or with an adult account for cloud saving across devices.</p>
+            <p>Emotion Sync Online is an educational activity created by Project Little Bridge. It can be used with a private guest account or an adult account. Both can store profiles and activity history online.</p>
           </header>
 
           <section className="privacy-section">
             <h2>What we collect</h2>
             <p>For signed-in use, we collect the adult account email and display name provided through Firebase Authentication. For each child profile, we store only the nickname entered by the adult and activity records such as answers, emotions selected, attempts, response times, timestamps, and session summaries.</p>
-            <p>For guest use, the Guest profile and its activity history are stored only in that browser. No email is requested and guest activity history is not uploaded to the Project Little Bridge database.</p>
+            <p>For guest use, Firebase Authentication assigns a random guest UID without asking for an email. After the responsible adult agrees, guest nicknames, profiles, and activity results are stored under that UID in Firestore. Existing browser progress is imported using its original activity IDs to avoid duplicate results. The browser keeps a local copy and queues results while offline.</p>
             <p>Each full website load adds one to an aggregate Firebase visit count. We also assign this browser a random identifier (UUID) to count returning browsers once. Firebase stores that identifier and its first registration time, plus an aggregate unique-browser count. Neither traffic counter is linked to an account, child nickname, or activity answers. A different browser, private browsing session, or clearing site data may count as another visitor.</p>
             <p>Do not enter a child’s full legal name, diagnosis, school, address, date of birth, or contact details.</p>
           </section>
@@ -56,7 +56,7 @@ export default function PrivacyContent() {
 
           <section className="privacy-section">
             <h2>Storage and sharing</h2>
-            <p>Authentication is provided by Google Firebase. Signed-in child profiles, signed-in activity history, and the browser traffic records are stored in Project Little Bridge’s Cloud Firestore database configured in the Bangkok region. Guest activity history stays in the browser and may disappear if browser data is cleared or the device is lost. We do not sell child or account data. Firebase processes cloud data as our service provider, and authorized Project Little Bridge administrators may access cloud data only when needed for security, support, or system maintenance.</p>
+            <p>Authentication is provided by Google Firebase. Guest and adult profiles, activity history, and browser traffic records are stored in Project Little Bridge’s Cloud Firestore database. The browser retains the guest sign-in credentials. Clearing browser data or losing the device may remove access to the guest account, even though its cloud records remain. We do not sell child or account data. Firebase processes cloud data as our service provider, and authorized Project Little Bridge administrators may access cloud data only when needed for security, support, or system maintenance.</p>
           </section>
 
           <section className="privacy-section">
@@ -64,10 +64,10 @@ export default function PrivacyContent() {
             <ul>
               <li>Download a child’s complete activity history as an English or Thai CSV from Progress &amp; History.</li>
               <li>Delete a child profile and all of its saved activity history from the account panel.</li>
-              <li>Delete all guest progress from this browser using Delete browser data.</li>
+              <li>Use Manage profile to delete a guest profile and its results, or Delete all guest profiles to remove all guest profiles and results from Firebase and this browser. Deletion needs an internet connection.</li>
               <li>Stop future activity collection by deleting the relevant data and not using tracked activities.</li>
             </ul>
-            <p>Signed-in data remains in the account until the adult deletes the child profile or asks Project Little Bridge for account-support deletion. Guest data remains until it is deleted in Emotion Sync Online or the browser’s site data is cleared. Signing in does not automatically upload earlier guest history. Delete browser data removes guest progress; the separate random visitor identifier remains to prevent duplicate traffic counts. Browser registration records are retained for counting repeat visits; clearing site data removes the identifier from your browser but does not remove an earlier registration from Firebase.</p>
+            <p>Guest and adult data remain online until deleted through the app or with help from Project Little Bridge. Clearing browser storage alone does not delete cloud records. The legacy local source is removed only after its upload is acknowledged; an updated browser copy remains. Guest and adult accounts are separate: signing in does not transfer guest results into an adult account. The separate random visitor identifier remains after deleting profiles to prevent duplicate traffic counts. Browser registration records are retained for counting repeat visits; clearing site data removes the identifier from your browser but does not remove an earlier registration from Firebase.</p>
           </section>
 
           <section className="privacy-section privacy-contact">
@@ -78,15 +78,15 @@ export default function PrivacyContent() {
       ) : (
         <article className="privacy-shell privacy-thai" lang="th">
           <header>
-            <p className="eyebrow">มีผลตั้งแต่วันที่ 6 กันยายน 2569</p>
+            <p className="eyebrow">มีผลตั้งแต่วันที่ 24 กันยายน 2569</p>
             <h1>ความเป็นส่วนตัวและการใช้ข้อมูล</h1>
-            <p>Emotion Sync Online เป็นกิจกรรมเพื่อการเรียนรู้ที่พัฒนาโดย Project Little Bridge ผู้ใช้สามารถใช้แบบผู้เยี่ยมชมโดยบันทึกในเบราว์เซอร์ หรือใช้บัญชีผู้ใหญ่เพื่อบันทึกบนคลาวด์และเปิดดูข้ามอุปกรณ์</p>
+            <p>Emotion Sync Online เป็นกิจกรรมเพื่อการเรียนรู้ที่พัฒนาโดย Project Little Bridge ผู้ใช้สามารถใช้บัญชีผู้เยี่ยมชมส่วนตัวหรือบัญชีผู้ใหญ่ โดยทั้งสองแบบบันทึกโปรไฟล์และประวัติกิจกรรมออนไลน์ได้</p>
           </header>
 
           <section className="privacy-section">
             <h2>ข้อมูลที่เราเก็บ</h2>
             <p>เมื่อเข้าสู่ระบบ เราเก็บอีเมลและชื่อที่แสดงของบัญชีผู้ใหญ่ผ่าน Firebase Authentication สำหรับโปรไฟล์เด็ก เราเก็บเฉพาะชื่อเล่นที่ผู้ใหญ่กรอก และข้อมูลกิจกรรม เช่น คำตอบ อารมณ์ที่เลือก จำนวนครั้งที่ลอง เวลาตอบ วันเวลา และสรุปรอบการฝึก</p>
-            <p>เมื่อใช้แบบผู้เยี่ยมชม โปรไฟล์ผู้เยี่ยมชมและประวัติกิจกรรมจะเก็บเฉพาะในเบราว์เซอร์นั้น โดยไม่ขออีเมลและไม่อัปโหลดประวัติกิจกรรมผู้เยี่ยมชมไปยังฐานข้อมูลของ Project Little Bridge</p>
+            <p>เมื่อใช้แบบผู้เยี่ยมชม Firebase Authentication จะสร้าง UID โดยไม่ขออีเมล เมื่อผู้ใหญ่ที่รับผิดชอบยินยอม ระบบจะบันทึกชื่อเล่น โปรไฟล์ และผลกิจกรรมใน Firestore ภายใต้ UID นี้ ข้อมูลเดิมในเบราว์เซอร์จะถูกนำเข้าโดยใช้รหัสกิจกรรมเดิมเพื่อไม่ให้ซ้ำ และเบราว์เซอร์จะเก็บสำเนาข้อมูลและรอส่งผลเมื่อกลับมาออนไลน์</p>
             <p>ทุกครั้งที่โหลดเว็บไซต์ใหม่ ระบบจะเพิ่มจำนวนการเข้าชมรวมใน Firebase หนึ่งครั้ง เรายังสร้างรหัสสุ่ม (UUID) สำหรับเบราว์เซอร์นี้เพื่อนับเบราว์เซอร์ที่กลับมาใช้งานเพียงครั้งเดียว Firebase เก็บรหัสนี้และเวลาที่ลงทะเบียนครั้งแรก พร้อมยอดรวมเบราว์เซอร์ที่ไม่ซ้ำ โดยไม่เชื่อมกับบัญชี ชื่อเล่นของเด็ก หรือคำตอบกิจกรรม การใช้เบราว์เซอร์อื่น โหมดส่วนตัว หรือล้างข้อมูลเว็บไซต์อาจถูกนับเป็นผู้เข้าชมใหม่</p>
             <p>กรุณาอย่ากรอกชื่อ-นามสกุลจริง การวินิจฉัย โรงเรียน ที่อยู่ วันเกิด หรือข้อมูลติดต่อของเด็ก</p>
           </section>
@@ -98,7 +98,7 @@ export default function PrivacyContent() {
 
           <section className="privacy-section">
             <h2>การจัดเก็บและการแบ่งปัน</h2>
-            <p>ระบบบัญชีให้บริการโดย Google Firebase โปรไฟล์เด็กที่เข้าสู่ระบบ ประวัติกิจกรรมที่เข้าสู่ระบบ และข้อมูลการเข้าชมของเบราว์เซอร์จัดเก็บใน Cloud Firestore ของ Project Little Bridge ซึ่งตั้งค่าฐานข้อมูลไว้ที่ภูมิภาคกรุงเทพฯ ประวัติกิจกรรมผู้เยี่ยมชมเก็บอยู่ในเบราว์เซอร์และอาจหายไปเมื่อล้างข้อมูลเบราว์เซอร์หรืออุปกรณ์สูญหาย เราไม่ขายข้อมูลของเด็กหรือข้อมูลบัญชี Firebase ประมวลผลข้อมูลบนคลาวด์ในฐานะผู้ให้บริการ และผู้ดูแล Project Little Bridge ที่ได้รับอนุญาตอาจเข้าถึงข้อมูลบนคลาวด์เฉพาะเมื่อจำเป็นต่อความปลอดภัย การช่วยเหลือ หรือการดูแลระบบ</p>
+            <p>ระบบบัญชีให้บริการโดย Google Firebase โปรไฟล์และผลกิจกรรมของผู้เยี่ยมชมและบัญชีผู้ใหญ่ รวมถึงข้อมูลการเข้าชม จัดเก็บใน Cloud Firestore ของ Project Little Bridge เบราว์เซอร์เก็บสิทธิ์เข้าถึงบัญชีผู้เยี่ยมชม การล้างข้อมูลเบราว์เซอร์หรือทำอุปกรณ์หายอาจทำให้เข้าถึงบัญชีเดิมไม่ได้ แม้ข้อมูลยังอยู่บนคลาวด์ เราไม่ขายข้อมูลของเด็กหรือข้อมูลบัญชี Firebase ประมวลผลข้อมูลบนคลาวด์ในฐานะผู้ให้บริการ และผู้ดูแล Project Little Bridge ที่ได้รับอนุญาตอาจเข้าถึงข้อมูลบนคลาวด์เฉพาะเมื่อจำเป็นต่อความปลอดภัย การช่วยเหลือ หรือการดูแลระบบ</p>
           </section>
 
           <section className="privacy-section">
@@ -106,10 +106,10 @@ export default function PrivacyContent() {
             <ul>
               <li>ดาวน์โหลดประวัติกิจกรรมทั้งหมดของเด็กเป็นไฟล์ CSV ภาษาอังกฤษหรือภาษาไทยจากหน้าความก้าวหน้าและประวัติ</li>
               <li>ลบโปรไฟล์เด็กและประวัติกิจกรรมทั้งหมดอย่างถาวรจากส่วนบัญชี</li>
-              <li>ลบความก้าวหน้าของผู้เยี่ยมชมทั้งหมดจากเบราว์เซอร์นี้ด้วยปุ่มลบข้อมูลในเบราว์เซอร์</li>
+              <li>ใช้จัดการโปรไฟล์เพื่อลบโปรไฟล์และผลกิจกรรม หรือใช้ลบโปรไฟล์ผู้เยี่ยมชมทั้งหมดเพื่อลบข้อมูลจาก Firebase และเบราว์เซอร์ การลบต้องเชื่อมต่ออินเทอร์เน็ต</li>
               <li>หยุดการเก็บข้อมูลกิจกรรมในอนาคตด้วยการลบข้อมูลที่เกี่ยวข้องและไม่ใช้กิจกรรมที่มีการติดตาม</li>
             </ul>
-            <p>ข้อมูลที่เข้าสู่ระบบจะอยู่ในบัญชีจนกว่าผู้ใหญ่จะลบโปรไฟล์เด็กหรือขอให้ Project Little Bridge ช่วยลบข้อมูลบัญชี ส่วนข้อมูลผู้เยี่ยมชมจะอยู่จนกว่าจะลบใน Emotion Sync Online หรือล้างข้อมูลเว็บไซต์ของเบราว์เซอร์ การเข้าสู่ระบบจะไม่อัปโหลดประวัติผู้เยี่ยมชมเดิมโดยอัตโนมัติ ปุ่มลบข้อมูลในเบราว์เซอร์จะลบประวัติกิจกรรม แต่ยังเก็บรหัสผู้เข้าชมแยกไว้เพื่อไม่ให้นับซ้ำ ข้อมูลลงทะเบียนเบราว์เซอร์จะเก็บไว้สำหรับนับผู้เข้าชมที่กลับมา การล้างข้อมูลเว็บไซต์จะลบรหัสจากเบราว์เซอร์ แต่ไม่ลบข้อมูลลงทะเบียนเดิมใน Firebase</p>
+            <p>ข้อมูลทั้งสองแบบจะอยู่บนคลาวด์จนกว่าจะลบผ่านแอปหรือขอความช่วยเหลือจาก Project Little Bridge การล้างเบราว์เซอร์อย่างเดียวไม่ลบข้อมูลบนคลาวด์ ข้อมูลเดิมจะถูกลบจากรูปแบบเก่าเมื่อ Firebase ยืนยันว่าบันทึกสำเร็จแล้ว โดยยังเก็บสำเนารูปแบบใหม่ในเบราว์เซอร์ บัญชีผู้เยี่ยมชมและบัญชีผู้ใหญ่แยกกัน การเข้าสู่ระบบไม่ย้ายผลผู้เยี่ยมชมไปบัญชีผู้ใหญ่ และยังเก็บรหัสผู้เข้าชมแยกไว้เพื่อไม่ให้นับซ้ำ ข้อมูลลงทะเบียนเบราว์เซอร์จะเก็บไว้สำหรับนับผู้เข้าชมที่กลับมา การล้างข้อมูลเว็บไซต์จะลบรหัสจากเบราว์เซอร์ แต่ไม่ลบข้อมูลลงทะเบียนเดิมใน Firebase</p>
           </section>
 
           <section className="privacy-section privacy-contact">
