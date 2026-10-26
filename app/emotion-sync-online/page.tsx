@@ -1,5 +1,6 @@
 "use client";
 import EmotionFace from "../EmotionFace";
+import DeviceModel from "../DeviceModel";
 
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
@@ -36,7 +37,7 @@ type Emotion = {
   id: EmotionId;
   en: string;
   th: string;
-  color: "yellow" | "black" | "blue" | "red";
+  color: "yellow" | "white" | "blue" | "red";
   learnEn: string;
   learnTh: string;
 };
@@ -106,7 +107,7 @@ const emotions: Emotion[] = [
   { id: "angry", en: "Angry", th: "โกรธ", color: "red", learnEn: "A strong feeling when something seems unfair, upsetting, or needs to stop.", learnTh: "ความรู้สึกแรงเมื่อบางอย่างทำให้ไม่พอใจ ดูไม่ยุติธรรม หรือเราอยากให้หยุด" },
   { id: "happy", en: "Happy", th: "มีความสุข", color: "yellow", learnEn: "A light, good feeling. You might smile or want to share it.", learnTh: "ความรู้สึกดีและเบาสบาย อาจทำให้เราอยากยิ้มหรือแบ่งปันความสุข" },
   { id: "sad", en: "Sad", th: "เศร้า", color: "blue", learnEn: "A heavy or low feeling. You may want comfort or some quiet time.", learnTh: "ความรู้สึกหนักหรือไม่สบายใจ เราอาจอยากได้รับกำลังใจหรืออยู่เงียบ ๆ สักพัก" },
-  { id: "calm", en: "Calm", th: "สงบ", color: "black", learnEn: "A quiet, settled feeling. Your body may feel relaxed.", learnTh: "ความรู้สึกนิ่งและผ่อนคลาย ร่างกายอาจรู้สึกสบายขึ้น" },
+  { id: "calm", en: "Calm", th: "สงบ", color: "white", learnEn: "A quiet, settled feeling. Your body may feel relaxed.", learnTh: "ความรู้สึกนิ่งและผ่อนคลาย ร่างกายอาจรู้สึกสบายขึ้น" },
 ];
 
 const emotionOrder: EmotionId[] = ["angry", "happy", "sad", "calm"];
@@ -467,6 +468,7 @@ export default function EmotionSyncOnlinePage() {
   const [questionStarted, setQuestionStarted] = useState(0);
   const [audioError, setAudioError] = useState(false);
   const [devicePrompt, setDevicePrompt] = useState<EmotionId | null>(null);
+  const [deviceSyncDemo, setDeviceSyncDemo] = useState(false);
   const [deviceAnswer, setDeviceAnswer] = useState<EmotionId | null>(null);
   const [everydayIndex, setEverydayIndex] = useState(0);
   const [everydayAnswer, setEverydayAnswer] = useState<EmotionId | null>(null);
@@ -1349,7 +1351,7 @@ export default function EmotionSyncOnlinePage() {
               <span className="v2-card-number">01</span><small>{c.guidedLabel}</small><h3>{c.guided}</h3><p>{c.guidedText}</p><b className="activity-start"><span aria-hidden="true">▶</span> {c.start}</b>
             </button>
             <button className={`v2-path-card is-check${!activeProfile ? " is-locked" : ""}`} type="button" onClick={() => startSession("check")}>
-              <div className="v2-path-visual v2-check-visual" aria-hidden="true"><div><strong>16</strong><span>{c.questions}</span></div><span className="dot-red" /><span className="dot-yellow" /><span className="dot-blue" /><span className="dot-black" /></div>
+              <div className="v2-path-visual v2-check-visual" aria-hidden="true"><div><strong>16</strong><span>{c.questions}</span></div><span className="dot-red" /><span className="dot-yellow" /><span className="dot-blue" /><span className="dot-white" /></div>
               <span className="v2-card-number">02</span><small>{c.checkLabel}</small><h3>{c.check}</h3><p>{c.checkText}</p><b className="activity-start"><span aria-hidden="true">▶</span> {c.start}</b>
             </button>
           </div>
@@ -1359,7 +1361,7 @@ export default function EmotionSyncOnlinePage() {
           <div className="v2-secondary-grid">
             <button type="button" className={!activeProfile ? "is-locked" : ""} onClick={() => openTrackedView("learn")}><div className="v2-secondary-art is-emotions" aria-hidden="true">{emotions.map((emotion) => <span className={`dot-${emotion.color}`} key={emotion.id}><EmotionFace emotion={emotion.id} /></span>)}</div><div><h3>{c.explore}</h3><p>{c.exploreText}</p></div><b>→</b></button>
             <button type="button" className={!activeProfile ? "is-locked" : ""} onClick={openEveryday}><div className="v2-secondary-art is-scenes" aria-hidden="true"><img src="/everyday-scenes/tower.webp" alt="" /><img src="/everyday-scenes/drawing.webp" alt="" /></div><div><h3>{c.everyday}</h3><p>{c.everydayText}</p><small>{c.unscoredLabel}</small></div><b>→</b></button>
-            <button type="button" className={!activeProfile ? "is-locked" : ""} onClick={() => openTrackedView("device")}><div className="v2-secondary-art is-device" aria-hidden="true"><img src="/emotion-sync-hero.png" alt="" /></div><div><h3>{c.device}</h3><p>{c.deviceText}</p></div><b>→</b></button>
+            <button type="button" className={!activeProfile ? "is-locked" : ""} onClick={() => openTrackedView("device")}><div className="v2-secondary-art is-device" aria-hidden="true"><img src="/device-model-preview.svg" width="640" height="425" alt="" /></div><div><h3>{c.device}</h3><p>{c.deviceText}</p></div><b>→</b></button>
           </div>
         </section>
       )}
@@ -1578,7 +1580,7 @@ export default function EmotionSyncOnlinePage() {
       )}
 
       {view === "device" && (
-        <section className="v2-shell v2-device-shell"><button className="v2-back-button" type="button" onClick={openHome}>← {c.backHome}</button><div className="v2-section-heading"><h2>{c.device}</h2><p>{c.deviceText}</p></div><div className="v2-device-area"><div className="v2-device-frame"><div className="device-model online-device"><span className="device-label">Emotion Sync · Prototype 03</span><div className="speaker"><i /><i /><i /></div><span className={`device-led led-yellow${deviceAnswer && !deviceCorrect ? " is-on" : ""}`} /><span className={`device-led led-green${deviceCorrect ? " is-on" : ""}`} /><button className="side-start-control" type="button" onClick={() => { const pool = emotionOrder.filter((item) => item !== devicePrompt); setDevicePrompt(randomEmotionFrom(pool)); setDeviceAnswer(null); }}><span>Start</span></button><div className="oled"><span className="oled-screw screw-one" /><span className="oled-screw screw-two" /><span className="oled-screw screw-three" /><span className="oled-screw screw-four" /><div className="oled-screen"><b>{devicePrompt ? <EmotionFace emotion={devicePrompt} /> : <span className="device-ready-symbol" aria-hidden="true">▶</span>}</b><span>{devicePrompt ? c.which : c.pressStart}</span></div></div><div className="prototype-controls">{emotions.map((emotion) => <button type="button" className={`model-button model-${emotion.color}`} key={emotion.id} disabled={!devicePrompt || Boolean(deviceAnswer)} onClick={() => chooseDeviceAnswer(emotion.id)}><span className="sr-only">{emotionName(emotion.id, language)}</span></button>)}</div></div></div><div className="online-feedback"><strong>{!devicePrompt ? c.pressStart : !deviceAnswer ? c.choose : deviceCorrect ? c.correct : c.retry}</strong><span>{!devicePrompt ? c.startHint : deviceCorrect ? c.correctDetail : deviceAnswer ? c.retryDetail : c.which}</span></div></div></section>
+        <section className="v2-shell v2-device-shell"><button className="v2-back-button" type="button" onClick={openHome}>← {c.backHome}</button><div className="v2-section-heading"><h2>{c.device}</h2><p>{c.deviceText}</p></div><div className="v2-device-area"><div className="v2-device-frame"><DeviceModel language={language} prompt={devicePrompt} answer={deviceAnswer} synced={deviceSyncDemo} onStart={() => { const pool = emotionOrder.filter(item => item !== devicePrompt); setDevicePrompt(randomEmotionFrom(pool)); setDeviceAnswer(null); setDeviceSyncDemo(false); }} onAnswer={chooseDeviceAnswer} onSync={() => setDeviceSyncDemo(true)} /></div><div className="online-feedback"><strong>{deviceSyncDemo ? (language === "th" ? "สาธิตปุ่มบันทึกข้อมูลแล้ว" : "Sync button demonstrated") : !devicePrompt ? c.pressStart : !deviceAnswer ? c.choose : deviceCorrect ? c.correct : c.retry}</strong><span>{deviceSyncDemo ? (language === "th" ? "ผลกิจกรรมออนไลน์บันทึกอัตโนมัติหลังตอบแต่ละข้อ" : "Online answers save automatically after each response.") : !devicePrompt ? c.startHint : deviceCorrect ? c.correctDetail : deviceAnswer ? c.retryDetail : c.which}</span></div></div></section>
       )}
 
       {exportLanguageOpen && (

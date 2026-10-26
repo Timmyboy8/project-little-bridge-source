@@ -136,7 +136,7 @@ const prototypeButtons: Array<{ emotion: EmotionChoice; color: string }> = [
   { emotion: "frustrated", color: "red" },
   { emotion: "happy", color: "yellow" },
   { emotion: "sad", color: "blue" },
-  { emotion: "calm", color: "black" },
+  { emotion: "calm", color: "white" },
 ];
 
 const quizSequence: EmotionChoice[] = ["happy", "sad", "frustrated", "calm"];
@@ -161,7 +161,7 @@ const siteCopy = {
     },
     hero: { summary: "An emotion-learning device for children with autism.", hint: "Press Start on the side, then match the emoji", cta: "How it helps", modelLabel: "Interactive digital model of the Emotion Sync prototype", startAria: "Show a new emoji face", syncAria: "Sync session data locally", groupAria: "Choose which emotion the emoji shows", screenSynced: "SYNCED", screenCorrect: "CORRECT", screenRetry: "TRY AGAIN", screenQuestion: "WHICH EMOTION?", screenStart: "PRESS START" },
     emotions: { happy: "Happy", calm: "Calm", sad: "Sad", frustrated: "Angry" },
-    feedback: { syncButton: "White Sync button", green: "Green light", yellow: "Yellow light", synced: "Session data synced.", correct: "Correct!", retry: "Look again and try once more.", syncText: "Session data is prepared for future local use.", correctText: "The answer matches the emoji.", wrongText: "The selected emotion does not match yet." },
+    feedback: { syncButton: "Black Sync button", green: "Green light", yellow: "Yellow light", synced: "Session data synced.", correct: "Correct!", retry: "Look again and try once more.", syncText: "Session data is prepared for future local use.", correctText: "The answer matches the emoji.", wrongText: "The selected emotion does not match yet." },
     learning: {
       eyebrow: "", titleA: "How Emotion Sync Helps", titleB: "", calm: "Practice without pressure.", calmText: "Clear faces, physical buttons, and simple feedback let each child learn at their own pace.",
       steps: [
@@ -172,20 +172,20 @@ const siteCopy = {
     },
     session: {
       eyebrow: "", titleA: "How One Session Works", titleB: "", tabs: ["Start", "Match", "Check", "Sync"], step: "Step", of: "of", back: "← Back",
-      hints: ["Use the Start button →", "Choose the matching emotion →", "Choose an answer first", "Press the white Sync button →"],
+      hints: ["Use the Start button →", "Choose the matching emotion →", "Choose an answer first", "Press the black Sync button →"],
       next: "Choose an answer", retry: "Try another answer", continue: "Continue to Sync", again: "Try again",
       steps: [
         { eyebrow: "Begin the activity", title: "Press Start.", text: "A new emoji face appears when the child or supporting adult presses Start." },
         { eyebrow: "Recognize the emotion", title: "Match the emoji.", text: "The child answers using one of the four colored buttons." },
         { eyebrow: "See the result", title: "The lights give feedback.", text: "Green means correct. Yellow invites the child to look again." },
-        { eyebrow: "Keep the learning data", title: "Press Sync.", text: "The white button prepares session data for future local use." },
+        { eyebrow: "Keep the learning data", title: "Press Sync.", text: "The black button prepares session data for future local use." },
       ],
-      question: "Which emotion is this?", yellowLight: "Yellow", tryAgain: "Try again", greenLight: "Green", correctSmall: "Correct", chooseFirst: "Choose an answer first.", correctAnswer: "Correct! That is happy.", notMatch: "That does not match—look again.", greenConfirm: "The green light confirms the match.", yellowRetry: "The yellow light invites another try.", returnMatch: "Return to Match to answer.", whiteButton: "White Sync button", synced: "Session data synced.", pressSync: "Press to sync the session.", syncedText: "Prepared for future local use.", localText: "Data stays local and is transferred intentionally.",
+      question: "Which emotion is this?", yellowLight: "Yellow", tryAgain: "Try again", greenLight: "Green", correctSmall: "Correct", chooseFirst: "Choose an answer first.", correctAnswer: "Correct! That is happy.", notMatch: "That does not match—look again.", greenConfirm: "The green light confirms the match.", yellowRetry: "The yellow light invites another try.", returnMatch: "Return to Match to answer.", syncButton: "Black Sync button", synced: "Session data synced.", pressSync: "Press to sync the session.", syncedText: "Prepared for future local use.", localText: "Data stays local and is transferred intentionally.",
     },
     story: {
-      origin: "Built by students in Bangkok", quote: "Every feeling deserves a way to be understood.", rhythm: ["Listen", "Build", "Share"], feel: "I feel", calm: "calm", proud: "proud", eyebrow: "",
-      title: "Why We Built Emotion Sync",
-      p1: "Project Little Bridge began with a simple idea: emotional learning should feel approachable, physical, and encouraging. We are building a tool children can use at their own pace.",
+      quote: "Bringing emotion learning", quoteAccent: "within reach.", rhythm: ["Listen", "Build", "Share"], eyebrow: "Our story", parts: ["A shared purpose", "Two ways to learn", "Built with communities"], photoCaption: "Sharing Emotion Sync at the Autistic Thai Foundation", photoAlt: "The Project Little Bridge team presenting an Emotion Sync device at the Autistic Thai Foundation",
+      title: "Why We Started Project Little Bridge",
+      p1: "Project Little Bridge is a student-led initiative founded by three students from Triam Udom Suksa School and KPIS, brought together by a shared desire to make emotion learning more accessible for children with autism in Thailand. We created Emotion Sync, a simple and interactive learning device, alongside our free online platform to give children more opportunities to practice recognizing emotions. To achieve this, we develop affordable technology, share it with organizations such as schools, hospitals, and foundations, and continuously improve it based on the feedback we receive. In doing so, we hope to bridge the gap between educational technology and the children who could benefit from it.",
       p2: "The goal is not to replace human connection—it is to make that connection easier to begin.",
       student: "Student-led", studentText: "Designed and built by our team", human: "Human-first", humanText: "Technology that supports connection", link: "Meet the people building it",
     },
@@ -194,12 +194,12 @@ const siteCopy = {
       features: [
         { tag: "Display", title: "See an emoji face", text: "The OLED displays one simple face showing an emotion." },
         { tag: "Touch", title: "Respond through touch", text: "Four physical buttons make answers direct and predictable." },
-        { tag: "Local", title: "Sync for later", text: "The white button prepares progress for future local use." },
+        { tag: "Local", title: "Sync for later", text: "The black button prepares progress for future local use." },
       ],
       architecture: "Prototype architecture", anywhere: "Built to work anywhere", offline: "Offline-first", map: "Emotion Sync · System map", controller: "Controller", runs: "Runs each session", prompt: "Emotion prompt", buttons: "4 buttons", childAnswer: "Child’s answer", led: "LED feedback", rightRetry: "Right or retry", localSync: "Local sync", progressLater: "Progress for later", privacy: "Privacy-minded by design", privacyText: "Core gameplay works offline. Progress stays local until it is intentionally transferred.",
     },
-    prototype: { eyebrow: "", titleA: "The Prototype We Built", titleB: "", lede: "The interactive model mirrors the working prototype our student team built and refined by hand.", facts: ["Tactile emotion responses", "Emoji face on the OLED", "Assembled by our team", "Made to test and improve"], hand: "Hand-built", iterative: "Iterative", link: "Follow the build journey" },
-    progress: { eyebrow: "", titleA: "Our Progress So Far", titleB: "", lede: "From our first sketch to sharing Emotion Sync with communities in Bangkok and Sakon Nakhon.", current: "Current stage", donating: "Now donating", distribution: "Community distribution", completed: "Completed", here: "We are here", steps: [{ title: "Device design", text: "Shaping the idea into a friendly device." }, { title: "Working prototype", text: "Building the controls and core experience." }, { title: "Testing & refinement", text: "Improving through trials and feedback." }, { title: "Community distribution", text: "Donating Emotion Sync to five organizations across Bangkok and Sakon Nakhon." }] },
+    prototype: { eyebrow: "", titleA: "Our Earlier Prototype", titleB: "", lede: "These photos show an earlier prototype. The current button layout uses black for Sync and white for Calm, as shown in the interactive model.", facts: ["Tactile emotion responses", "Emoji face on the OLED", "Assembled by our team", "Made to test and improve"], hand: "Hand-built", iterative: "Iterative", link: "Follow the build journey" },
+    progress: { eyebrow: "", titleA: "Our Progress So Far", titleB: "", lede: "From our first sketch to sharing Emotion Sync with communities across Thailand.", current: "Current stage", donating: "Sharing & improving", distribution: "Community distribution", completed: "Completed", ongoing: "Ongoing", here: "We are here", steps: [{ title: "Device design", text: "Shaping the idea into a friendly device." }, { title: "Working prototype", text: "Building the controls and core experience." }, { title: "Testing & refinement", text: "Refined the device using our first round of feedback." }, { title: "Community distribution", text: "Sharing devices and collecting further community feedback." }] },
     reach: { eyebrow: "Where we donate", titleA: "A little bridge", titleB: "across Thailand.", lede: "Explore our donation locations in Bangkok and Sakon Nakhon.", stat: "recipient organizations", bangkok: "Bangkok", province: "Donation province", recipient: "Recipient organization", recipientPending: "Recipient names will appear here once confirmed.", prompt: "Choose Bangkok or Sakon Nakhon to see the recipient organizations. Select a place to explore its story.", mapTitle: "Thailand donation map", inProgress: "Devices donated", caption: "Emotion Sync has reached five organizations across Bangkok and Sakon Nakhon.", show: "Bangkok. Show donation locations.", hide: "Bangkok. Hide donation locations." },
     team: { eyebrow: "", titleA: "Meet Our Team", titleB: "", lede: "Students from two Bangkok schools combining engineering, design, and outreach.", roles: ["Founder", "Co-Founder", "Engineer"], schools: ["Triam Udom Suksa School", "KPIS International School", "Triam Udom Suksa School"], details: ["Vision, device design, prototyping, and evaluation.", "Assembly, testing, outreach, promotion, and the website.", "Exterior design, enclosure development, and digital experience."] },
     cta: { eyebrow: "", titleA: "Get Involved", titleB: "", text: "Educators, caregivers, partners, and supporters can help us test, improve, and share Emotion Sync.", conversation: "Start a conversation", follow: "Follow our journey", subject: "Conversation with Project Little Bridge", body: "Hello Project Little Bridge team,\n\nI would like to learn more about the project.\n\nMy message:\n", practiceEyebrow: "Free online practice", practiceTitle: "Practice emotions online", practiceText: "Start as a guest with progress saved in this browser, or create a free adult account to keep it available across devices—without timers or score pressure.", practiceButton: "Practice Online", formTitle: "Send us a message", formIntro: "Choose a reason and tell us how we can help.", name: "Name", email: "Email", organisation: "School or organization (optional)", reason: "I am interested in", message: "Message", messagePlaceholder: "Tell us a little about how you would like to help", submit: "Send message", sending: "Sending…", success: "Thanks—your message has been sent. We’ll get back to you soon.", error: "We couldn’t send your message. Please try again in a moment.", formNote: "Your message will be sent directly to the Project Little Bridge team.", reasons: ["Partner with us", "Support production", "Invite our team", "General question"] },
@@ -220,14 +220,14 @@ const siteCopy = {
     },
     hero: { summary: "อุปกรณ์ฝึกแยกแยะอารมณ์สำหรับเด็กออทิสติก", hint: "กดปุ่ม Start ด้านข้าง แล้วเลือกอารมณ์ที่ตรงกับใบหน้า", cta: "ดูวิธีใช้งาน", modelLabel: "ลองใช้งาน Emotion Sync แบบจำลอง", startAria: "แสดงอีโมจิใหม่", syncAria: "บันทึกข้อมูลไว้ในเครื่อง", groupAria: "กดเลือกอารมณ์ที่อีโมจิแสดง", screenSynced: "บันทึกแล้ว", screenCorrect: "ถูกต้อง", screenRetry: "ลองอีกครั้ง", screenQuestion: "อารมณ์อะไร?", screenStart: "กด START" },
     emotions: { happy: "มีความสุข", calm: "สงบ", sad: "เศร้า", frustrated: "โกรธ" },
-    feedback: { syncButton: "ปุ่มบันทึกข้อมูลสีขาว", green: "ไฟสีเขียว", yellow: "ไฟสีเหลือง", synced: "บันทึกข้อมูลแล้ว", correct: "ถูกต้อง!", retry: "ยังไม่ถูก ลองอีกครั้ง", syncText: "บันทึกผลการเล่นรอบนี้ไว้สำหรับดาวน์โหลดในภายหลัง", correctText: "คำตอบตรงกับอีโมจิ", wrongText: "คำตอบที่เลือกยังไม่ตรงกับอีโมจิ" },
+    feedback: { syncButton: "ปุ่มบันทึกข้อมูลสีดำ", green: "ไฟสีเขียว", yellow: "ไฟสีเหลือง", synced: "บันทึกข้อมูลแล้ว", correct: "ถูกต้อง!", retry: "ยังไม่ถูก ลองอีกครั้ง", syncText: "บันทึกผลการเล่นรอบนี้ไว้สำหรับดาวน์โหลดในภายหลัง", correctText: "คำตอบตรงกับอีโมจิ", wrongText: "คำตอบที่เลือกยังไม่ตรงกับอีโมจิ" },
     learning: { eyebrow: "", titleA: "Emotion Sync ช่วยอย่างไร", titleB: "", calm: "ฝึกได้โดยไม่กดดัน", calmText: "ภาพอีโมจิที่เข้าใจง่าย ปุ่มกด และไฟบอกผล ช่วยให้เด็กค่อย ๆ ฝึกได้ในแบบของตัวเอง", steps: [{ cue: "ดูหน้าอีโมจิ", title: "สังเกตอารมณ์", text: "เด็กดูหน้าอีโมจิ แล้วฝึกแยกแยะอารมณ์ 4 แบบ" }, { cue: "กดปุ่มสี", title: "เลือกคำตอบ", text: "เด็กกดปุ่มสีเพื่อเลือกอารมณ์ที่คิดว่าใช่" }, { cue: "ดูผลการตอบ", title: "ฝึกต่อได้ตรงจุด", text: "ผลการตอบช่วยให้ครู ผู้ปกครอง และผู้ดูแลเห็นว่าเด็กควรฝึกอารมณ์ไหนเพิ่ม" }] },
-    session: { eyebrow: "", titleA: "วิธีใช้งานในหนึ่งรอบ", titleB: "", tabs: ["เริ่ม", "เลือก", "ดูผล", "บันทึก"], step: "ขั้นตอนที่", of: "/", back: "← กลับ", hints: ["กดปุ่ม Start →", "เลือกอารมณ์ที่ตรงกับใบหน้า →", "กลับไปเลือกคำตอบก่อน", "กดปุ่มสีขาว →"], next: "กลับไปเลือกคำตอบ", retry: "ลองอีกครั้ง", continue: "ไปขั้นบันทึกข้อมูล", again: "เริ่มใหม่", steps: [{ eyebrow: "เริ่มใช้งาน", title: "กดปุ่ม Start", text: "เมื่อเด็กหรือผู้ดูแลกด Start หน้าจอจะแสดงอีโมจิ 1 หน้า" }, { eyebrow: "ดูหน้าอีโมจิ", title: "เลือกอารมณ์", text: "ให้เด็กกดปุ่มสี 1 ใน 4 ปุ่มเพื่อเลือกคำตอบ" }, { eyebrow: "ดูผลการตอบ", title: "ดูไฟบอกผล", text: "ถ้าตอบถูก ไฟสีเขียวจะติด หากตอบผิด ไฟสีเหลืองจะติด" }, { eyebrow: "บันทึกข้อมูล", title: "กดปุ่มสีขาว", text: "กดปุ่มสีขาวเพื่อบันทึกผลการเล่นไว้สำหรับดาวน์โหลดในภายหลัง" }], question: "อีโมจินี้แสดงอารมณ์อะไร?", yellowLight: "สีเหลือง", tryAgain: "ลองอีกครั้ง", greenLight: "สีเขียว", correctSmall: "ถูกต้อง", chooseFirst: "กรุณาเลือกคำตอบก่อน", correctAnswer: "ถูกต้อง! อีโมจินี้แสดงความสุข", notMatch: "ยังไม่ถูก ลองอีกครั้ง", greenConfirm: "ตอบถูกแล้ว ไฟสีเขียวจะติด", yellowRetry: "หากตอบผิด ไฟสีเหลืองจะติดเพื่อให้ลองอีกครั้ง", returnMatch: "กลับไปเลือกคำตอบก่อน", whiteButton: "ปุ่มบันทึกข้อมูลสีขาว", synced: "บันทึกข้อมูลแล้ว", pressSync: "กดเพื่อบันทึกข้อมูล", syncedText: "บันทึกผลการเล่นรอบนี้เรียบร้อยแล้ว", localText: "ข้อมูลจะเก็บอยู่ในเครื่อง และส่งออกเมื่อผู้ใช้เลือกเท่านั้น" },
-    story: { origin: "สร้างโดยนักเรียนในกรุงเทพฯ", quote: "เราอยากช่วยให้เด็กเข้าใจและบอกความรู้สึกได้ง่ายขึ้น", rhythm: ["รับฟัง", "สร้าง", "แบ่งปัน"], feel: "ฉันรู้สึก", calm: "สงบ", proud: "ภูมิใจ", eyebrow: "", title: "เหตุผลที่เราสร้าง Emotion Sync", p1: "เราเริ่ม Project Little Bridge เพราะอยากทำให้การฝึกเรื่องอารมณ์เข้าใจง่ายและเป็นมิตรกับเด็ก จึงพัฒนาอุปกรณ์ที่เด็กสามารถดู กดตอบ และฝึกซ้ำได้ตามความพร้อม", p2: "อุปกรณ์นี้ไม่ได้มาแทนครู ผู้ปกครอง หรือผู้ดูแล แต่ช่วยให้เริ่มพูดคุยเรื่องอารมณ์กับเด็กได้ง่ายขึ้น", student: "นักเรียนเป็นผู้ลงมือทำ", studentText: "ทีมของเราออกแบบและสร้างอุปกรณ์ด้วยตัวเอง", human: "สร้างเพื่อเด็กและผู้ดูแล", humanText: "ใช้เทคโนโลยีช่วยให้เด็กกับผู้ดูแลเข้าใจกันมากขึ้น", link: "รู้จักทีมผู้สร้าง" },
-    product: { eyebrow: "", titleA: "ภายใน Emotion Sync", titleB: "", lede: "Emotion Sync รวมหน้าจอ ปุ่มกด ไฟบอกผล และการบันทึกข้อมูลไว้ในอุปกรณ์เดียว", features: [{ tag: "หน้าจอ", title: "ดูหน้าอีโมจิ", text: "จอ OLED แสดงหน้าอีโมจิ 1 หน้าให้เด็กทายอารมณ์" }, { tag: "ปุ่มกด", title: "เลือกคำตอบ", text: "เด็กกดปุ่มสี 1 ใน 4 ปุ่มเพื่อเลือกคำตอบ" }, { tag: "บันทึก", title: "บันทึกผลการเล่น", text: "ปุ่มสีขาวใช้บันทึกผลไว้สำหรับดาวน์โหลดในภายหลัง" }], architecture: "โครงสร้างต้นแบบ", anywhere: "ใช้งานได้โดยไม่ต้องต่ออินเทอร์เน็ต", offline: "ทำงานออฟไลน์", map: "Emotion Sync · แผนผังระบบ", controller: "ตัวควบคุม", runs: "ควบคุมการทำงานของอุปกรณ์", prompt: "แสดงอารมณ์", buttons: "4 ปุ่ม", childAnswer: "คำตอบของเด็ก", led: "ไฟบอกผล", rightRetry: "ตอบถูก / ลองอีกครั้ง", localSync: "บันทึกในเครื่อง", progressLater: "บันทึกผลการเล่น", privacy: "คำนึงถึงความเป็นส่วนตัว", privacyText: "อุปกรณ์ใช้งานได้โดยไม่ต้องต่ออินเทอร์เน็ต ข้อมูลจะเก็บอยู่ในเครื่องและส่งออกเมื่อผู้ใช้เลือกเท่านั้น" },
-    prototype: { eyebrow: "", titleA: "ต้นแบบที่เราสร้าง", titleB: "", lede: "แบบจำลองด้านบนสร้างจากต้นแบบจริงที่ทีมของเราประกอบและปรับปรุงด้วยตัวเอง", facts: ["ปุ่มเลือกคำตอบ 4 ปุ่ม", "หน้าอีโมจิบนจอ OLED", "ประกอบโดยทีมของเรา", "นำผลทดสอบมาพัฒนาต่อ"], hand: "สร้างด้วยมือ", iterative: "ปรับปรุงจากการทดสอบ", link: "ดูขั้นตอนการพัฒนา" },
-    progress: { eyebrow: "", titleA: "ความคืบหน้าของเรา", titleB: "", lede: "จากแบบร่างแรก สู่การส่งมอบ Emotion Sync ให้หน่วยงานในกรุงเทพฯ และสกลนคร", current: "ขั้นตอนปัจจุบัน", donating: "เริ่มส่งมอบแล้ว", distribution: "ส่งมอบอุปกรณ์ให้ชุมชน", completed: "เสร็จแล้ว", here: "เราอยู่ตรงนี้", steps: [{ title: "ออกแบบอุปกรณ์", text: "เปลี่ยนแนวคิดให้เป็นอุปกรณ์ที่เด็กใช้งานได้ง่าย" }, { title: "ต้นแบบที่ใช้งานได้", text: "ประกอบปุ่ม หน้าจอ และระบบการทำงานหลัก" }, { title: "ทดสอบและปรับปรุง", text: "ทดลองใช้งานและนำคำแนะนำมาปรับปรุง" }, { title: "ส่งมอบอุปกรณ์ให้ชุมชน", text: "ส่งมอบ Emotion Sync ให้หน่วยงาน 5 แห่งในกรุงเทพฯ และสกลนคร" }] },
-    reach: { eyebrow: "พื้นที่ที่เราส่งมอบอุปกรณ์", titleA: "สะพานเล็ก ๆ", titleB: "ทั่วประเทศไทย", lede: "ดูสถานที่รับมอบ Emotion Sync ในกรุงเทพฯ และสกลนครผ่านแผนที่ด้านล่าง", stat: "หน่วยงานที่ได้รับมอบ", bangkok: "กรุงเทพมหานคร", province: "จังหวัดที่ส่งมอบอุปกรณ์", recipient: "หน่วยงานที่รับมอบอุปกรณ์", recipientPending: "จะแสดงชื่อหน่วยงานเมื่อได้รับการยืนยัน", prompt: "เลือกกรุงเทพฯ หรือสกลนครเพื่อดูหน่วยงานที่รับมอบ แล้วเลือกสถานที่เพื่ออ่านเรื่องราว", mapTitle: "แผนที่การส่งมอบ Emotion Sync", inProgress: "ส่งมอบอุปกรณ์แล้ว", caption: "เราส่งมอบ Emotion Sync ให้หน่วยงาน 5 แห่งในกรุงเทพฯ และสกลนครแล้ว", show: "กรุงเทพฯ แสดงหน่วยงานที่ได้รับมอบอุปกรณ์", hide: "กรุงเทพฯ ซ่อนรายละเอียดหน่วยงาน" },
+    session: { eyebrow: "", titleA: "วิธีใช้งานในหนึ่งรอบ", titleB: "", tabs: ["เริ่ม", "เลือก", "ดูผล", "บันทึก"], step: "ขั้นตอนที่", of: "/", back: "← กลับ", hints: ["กดปุ่ม Start →", "เลือกอารมณ์ที่ตรงกับใบหน้า →", "กลับไปเลือกคำตอบก่อน", "กดปุ่มสีดำ →"], next: "กลับไปเลือกคำตอบ", retry: "ลองอีกครั้ง", continue: "ไปขั้นบันทึกข้อมูล", again: "เริ่มใหม่", steps: [{ eyebrow: "เริ่มใช้งาน", title: "กดปุ่ม Start", text: "เมื่อเด็กหรือผู้ดูแลกด Start หน้าจอจะแสดงอีโมจิ 1 หน้า" }, { eyebrow: "ดูหน้าอีโมจิ", title: "เลือกอารมณ์", text: "ให้เด็กกดปุ่มสี 1 ใน 4 ปุ่มเพื่อเลือกคำตอบ" }, { eyebrow: "ดูผลการตอบ", title: "ดูไฟบอกผล", text: "ถ้าตอบถูก ไฟสีเขียวจะติด หากตอบผิด ไฟสีเหลืองจะติด" }, { eyebrow: "บันทึกข้อมูล", title: "กดปุ่มสีดำ", text: "กดปุ่มสีดำเพื่อบันทึกผลการเล่นไว้สำหรับดาวน์โหลดในภายหลัง" }], question: "อีโมจินี้แสดงอารมณ์อะไร?", yellowLight: "สีเหลือง", tryAgain: "ลองอีกครั้ง", greenLight: "สีเขียว", correctSmall: "ถูกต้อง", chooseFirst: "กรุณาเลือกคำตอบก่อน", correctAnswer: "ถูกต้อง! อีโมจินี้แสดงความสุข", notMatch: "ยังไม่ถูก ลองอีกครั้ง", greenConfirm: "ตอบถูกแล้ว ไฟสีเขียวจะติด", yellowRetry: "หากตอบผิด ไฟสีเหลืองจะติดเพื่อให้ลองอีกครั้ง", returnMatch: "กลับไปเลือกคำตอบก่อน", syncButton: "ปุ่มบันทึกข้อมูลสีดำ", synced: "บันทึกข้อมูลแล้ว", pressSync: "กดเพื่อบันทึกข้อมูล", syncedText: "บันทึกผลการเล่นรอบนี้เรียบร้อยแล้ว", localText: "ข้อมูลจะเก็บอยู่ในเครื่อง และส่งออกเมื่อผู้ใช้เลือกเท่านั้น" },
+    story: { quote: "ให้การเรียนรู้เรื่องอารมณ์", quoteAccent: "เป็นสิ่งที่เด็กเข้าถึงได้", rhythm: ["รับฟัง", "สร้าง", "แบ่งปัน"], eyebrow: "เรื่องราวของเรา", parts: ["ความตั้งใจเดียวกัน", "สองทางเลือกในการเรียนรู้", "พัฒนาไปพร้อมกับชุมชน"], photoCaption: "ส่งมอบ Emotion Sync ณ มูลนิธิออทิสติกไทย", photoAlt: "ทีม Project Little Bridge ส่งมอบอุปกรณ์ Emotion Sync ที่มูลนิธิออทิสติกไทย", title: "เหตุผลที่เราเริ่ม Project Little Bridge", p1: "Project Little Bridge เป็นโครงการที่ริเริ่มโดยนักเรียนสามคนจากโรงเรียนเตรียมอุดมศึกษาและโรงเรียน KPIS ซึ่งมีความตั้งใจร่วมกันที่จะทำให้เด็กออทิสติกในประเทศไทยเข้าถึงการเรียนรู้เรื่องอารมณ์ได้มากขึ้น เราจึงสร้าง Emotion Sync อุปกรณ์การเรียนรู้ที่ใช้งานง่ายและมีปฏิสัมพันธ์ ควบคู่กับแพลตฟอร์มออนไลน์ที่เปิดให้ใช้ฟรี เพื่อให้เด็กมีโอกาสฝึกจดจำอารมณ์มากขึ้น เราพัฒนาเทคโนโลยีที่มีต้นทุนเข้าถึงได้ ส่งมอบให้หน่วยงานต่าง ๆ ทั้งโรงเรียน โรงพยาบาล และมูลนิธิ พร้อมปรับปรุงอย่างต่อเนื่องจากคำแนะนำที่ได้รับ เราหวังว่าสิ่งที่ทำจะช่วยเชื่อมช่องว่างระหว่างเทคโนโลยีเพื่อการศึกษากับเด็กที่อาจได้รับประโยชน์จากเทคโนโลยีเหล่านี้", p2: "อุปกรณ์นี้ไม่ได้มาแทนครู ผู้ปกครอง หรือผู้ดูแล แต่ช่วยให้เริ่มพูดคุยเรื่องอารมณ์กับเด็กได้ง่ายขึ้น", student: "นักเรียนเป็นผู้ลงมือทำ", studentText: "ทีมของเราออกแบบและสร้างอุปกรณ์ด้วยตัวเอง", human: "สร้างเพื่อเด็กและผู้ดูแล", humanText: "ใช้เทคโนโลยีช่วยให้เด็กกับผู้ดูแลเข้าใจกันมากขึ้น", link: "รู้จักทีมผู้สร้าง" },
+    product: { eyebrow: "", titleA: "ภายใน Emotion Sync", titleB: "", lede: "Emotion Sync รวมหน้าจอ ปุ่มกด ไฟบอกผล และการบันทึกข้อมูลไว้ในอุปกรณ์เดียว", features: [{ tag: "หน้าจอ", title: "ดูหน้าอีโมจิ", text: "จอ OLED แสดงหน้าอีโมจิ 1 หน้าให้เด็กทายอารมณ์" }, { tag: "ปุ่มกด", title: "เลือกคำตอบ", text: "เด็กกดปุ่มสี 1 ใน 4 ปุ่มเพื่อเลือกคำตอบ" }, { tag: "บันทึก", title: "บันทึกผลการเล่น", text: "ปุ่มสีดำใช้บันทึกผลไว้สำหรับดาวน์โหลดในภายหลัง" }], architecture: "โครงสร้างต้นแบบ", anywhere: "ใช้งานได้โดยไม่ต้องต่ออินเทอร์เน็ต", offline: "ทำงานออฟไลน์", map: "Emotion Sync · แผนผังระบบ", controller: "ตัวควบคุม", runs: "ควบคุมการทำงานของอุปกรณ์", prompt: "แสดงอารมณ์", buttons: "4 ปุ่ม", childAnswer: "คำตอบของเด็ก", led: "ไฟบอกผล", rightRetry: "ตอบถูก / ลองอีกครั้ง", localSync: "บันทึกในเครื่อง", progressLater: "บันทึกผลการเล่น", privacy: "คำนึงถึงความเป็นส่วนตัว", privacyText: "อุปกรณ์ใช้งานได้โดยไม่ต้องต่ออินเทอร์เน็ต ข้อมูลจะเก็บอยู่ในเครื่องและส่งออกเมื่อผู้ใช้เลือกเท่านั้น" },
+    prototype: { eyebrow: "", titleA: "ต้นแบบรุ่นก่อนของเรา", titleB: "", lede: "ภาพเหล่านี้เป็นต้นแบบรุ่นก่อน ปัจจุบันใช้ปุ่มสีดำสำหรับบันทึกข้อมูล และปุ่มสีขาวสำหรับอารมณ์สงบ ตามแบบจำลองที่กดลองได้", facts: ["ปุ่มเลือกคำตอบ 4 ปุ่ม", "หน้าอีโมจิบนจอ OLED", "ประกอบโดยทีมของเรา", "นำผลทดสอบมาพัฒนาต่อ"], hand: "สร้างด้วยมือ", iterative: "ปรับปรุงจากการทดสอบ", link: "ดูขั้นตอนการพัฒนา" },
+    progress: { eyebrow: "", titleA: "ความคืบหน้าของเรา", titleB: "", lede: "จากแบบร่างแรก สู่การส่งมอบ Emotion Sync ให้ชุมชนทั่วประเทศไทย", current: "ขั้นตอนปัจจุบัน", donating: "ส่งมอบและพัฒนาอย่างต่อเนื่อง", distribution: "ส่งมอบอุปกรณ์ให้ชุมชน", completed: "เสร็จแล้ว", ongoing: "ดำเนินการต่อเนื่อง", here: "เราอยู่ตรงนี้", steps: [{ title: "ออกแบบอุปกรณ์", text: "เปลี่ยนแนวคิดให้เป็นอุปกรณ์ที่เด็กใช้งานได้ง่าย" }, { title: "ต้นแบบที่ใช้งานได้", text: "ประกอบปุ่ม หน้าจอ และระบบการทำงานหลัก" }, { title: "ทดสอบและปรับปรุง", text: "ปรับปรุงอุปกรณ์จากคำแนะนำรอบแรกแล้ว" }, { title: "ส่งมอบอุปกรณ์ให้ชุมชน", text: "ส่งมอบอุปกรณ์ พร้อมรับฟังคำแนะนำเพิ่มเติมจากชุมชน" }] },
+    reach: { eyebrow: "พื้นที่ที่เราส่งมอบอุปกรณ์", titleA: "สะพานเล็ก ๆ", titleB: "ทั่วประเทศไทย", lede: "ดูสถานที่รับมอบ Emotion Sync ในกรุงเทพฯ และสกลนครผ่านแผนที่ด้านล่าง", stat: "หน่วยงานที่ได้รับมอบ", bangkok: "กรุงเทพมหานคร", province: "จังหวัดที่ส่งมอบอุปกรณ์", recipient: "หน่วยงานที่รับมอบอุปกรณ์", recipientPending: "จะแสดงชื่อหน่วยงานเมื่อได้รับการยืนยัน", prompt: "เลือกกรุงเทพฯ หรือสกลนครเพื่อดูหน่วยงานที่รับมอบ แล้วเลือกสถานที่เพื่ออ่านเรื่องราว", mapTitle: "แผนที่การส่งมอบ Emotion Sync", inProgress: "ส่งมอบอุปกรณ์แล้ว", caption: "เราส่งมอบอุปกรณ์ พร้อมรับฟังคำแนะนำเพิ่มเติมจากชุมชนแล้ว", show: "กรุงเทพฯ แสดงหน่วยงานที่ได้รับมอบอุปกรณ์", hide: "กรุงเทพฯ ซ่อนรายละเอียดหน่วยงาน" },
     team: { eyebrow: "", titleA: "พบกับทีมของเรา", titleB: "", lede: "ทีมของเราประกอบด้วยนักเรียนจาก 2 โรงเรียนในกรุงเทพฯ ที่ร่วมกันดูแลงานด้านวิศวกรรม การออกแบบ และการประชาสัมพันธ์", roles: ["ผู้ก่อตั้ง", "ผู้ร่วมก่อตั้ง", "วิศวกร"], schools: ["โรงเรียนเตรียมอุดมศึกษา", "โรงเรียนนานาชาติ KPIS", "โรงเรียนเตรียมอุดมศึกษา"], details: ["ดูแลแนวคิดหลัก ออกแบบอุปกรณ์ สร้างต้นแบบ และประเมินผล", "ดูแลการประกอบ การทดสอบ การประชาสัมพันธ์ และการพัฒนาเว็บไซต์", "ดูแลรูปลักษณ์ภายนอก ตัวเครื่อง และส่วนใช้งานดิจิทัล"] },
     cta: { eyebrow: "", titleA: "ร่วมสนับสนุนโครงการ", titleB: "", text: "หากคุณเป็นครู ผู้ปกครอง ผู้ดูแล หรือองค์กรที่สนใจ คุณสามารถช่วยทดลอง ให้คำแนะนำ หรือร่วมสนับสนุนการส่งมอบ Emotion Sync ให้เด็ก ๆ ได้", conversation: "ติดต่อเรา", follow: "ติดตามเรา", subject: "ติดต่อ Project Little Bridge", body: "สวัสดีทีม Project Little Bridge\n\nสนใจสอบถามข้อมูลเพิ่มเติมเกี่ยวกับโครงการ Emotion Sync\n\nรายละเอียดที่ต้องการสอบถาม:\n", practiceEyebrow: "ฝึกออนไลน์ฟรี", practiceTitle: "ฝึกอารมณ์ออนไลน์", practiceText: "เริ่มแบบผู้เยี่ยมชมโดยบันทึกความก้าวหน้าในเบราว์เซอร์นี้ หรือสร้างบัญชีผู้ใหญ่ฟรีเพื่อเปิดดูข้อมูลจากอุปกรณ์อื่น โดยไม่มีการจับเวลาหรือแรงกดดันจากคะแนน", practiceButton: "เริ่มฝึกออนไลน์", formTitle: "ส่งข้อความถึงเรา", formIntro: "เลือกหัวข้อแล้วเขียนข้อความสั้น ๆ ถึงทีมของเรา", name: "ชื่อ", email: "อีเมล", organisation: "โรงเรียนหรือองค์กร (ไม่บังคับ)", reason: "เรื่องที่ต้องการติดต่อ", message: "ข้อความ", messagePlaceholder: "บอกเราเพิ่มเติมว่าคุณอยากร่วมสนับสนุนอย่างไร", submit: "ส่งข้อความ", sending: "กำลังส่ง…", success: "ส่งข้อความแล้ว ขอบคุณที่ติดต่อเรา เราจะตอบกลับโดยเร็ว", error: "ส่งข้อความไม่สำเร็จ กรุณาลองใหม่อีกครั้ง", formNote: "ข้อความจะถูกส่งถึงทีม Project Little Bridge โดยตรง", reasons: ["ร่วมเป็นพาร์ตเนอร์", "สนับสนุนค่าอุปกรณ์", "เชิญทีมไปนำเสนอ", "สอบถามทั่วไป"] },
     footer: { text: "ร่วมกันช่วยให้เด็กเข้าใจและสื่อสารความรู้สึกได้ง่ายขึ้น", follow: "ติดตาม Project Little Bridge", instagram: "ติดตาม Project Little Bridge บน Instagram", facebook: "ติดตาม Project Little Bridge บน Facebook", privacy: "ความเป็นส่วนตัว", top: "กลับขึ้นด้านบน ↑" },
@@ -465,7 +465,7 @@ export default function Home() {
               </button>
 
               <button
-                className="white-control"
+                className="sync-control"
                 type="button"
                 aria-label={c.hero.syncAria}
                 onClick={() => setSyncComplete(true)}
@@ -533,6 +533,40 @@ export default function Home() {
             )}
           </div>
 
+        </div>
+      </section>
+
+      <section className="story-section" id="story" aria-labelledby="story-title">
+        <div className="story-shell story-editorial">
+          <header className="story-heading">
+            <p className="eyebrow">{c.story.eyebrow}</p>
+            <h2 id="story-title">{c.story.title}</h2>
+          </header>
+          <div className="story-editorial-grid">
+            <div className="story-mission">
+              <figure className="story-photo">
+                <img src="/donations/autistic-thai-foundation/donation.jpg" width="1706" height="960" loading="lazy" alt={c.story.photoAlt} />
+                <figcaption>{c.story.photoCaption}</figcaption>
+              </figure>
+              <div className="story-mission-copy">
+                <p>{c.story.quote} <span>{c.story.quoteAccent}</span></p>
+                <div className="story-mission-rhythm">
+                  {c.story.rhythm.map((step, index) => <span key={step}>{index > 0 && <i aria-hidden="true">→</i>}{step}</span>)}
+                </div>
+              </div>
+            </div>
+            <div className="story-narrative">
+              <div className="story-chapters">
+                {(language === "en" ? c.story.p1.split(/(?=We created |To achieve this, )/) : c.story.p1.split(/(?=เราจึงสร้าง |เราพัฒนาเทคโนโลยี)/)).map((paragraph, index) => (
+                  <div className="story-chapter" key={index}>
+                    <span className="story-chapter-icon" aria-hidden="true">{index === 0 ? <IconPeople /> : index === 1 ? <IconHand /> : <IconSpark />}</span>
+                    <div><h3>{c.story.parts[index]}</h3><p>{paragraph.trim()}</p></div>
+                  </div>
+                ))}
+              </div>
+              <a className="text-link story-team-link" href="#team">{c.story.link}<IconArrow /></a>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -674,7 +708,7 @@ export default function Home() {
                   <button type="button" className={`session-sync-button${sessionSynced ? " is-synced" : ""}`} onClick={() => setSessionSynced(true)} aria-label={c.hero.syncAria}>
                     <span aria-hidden="true">{sessionSynced ? "✓" : ""}</span>
                   </button>
-                  <small>{c.session.whiteButton}</small>
+                  <small>{c.session.syncButton}</small>
                   <strong>{sessionSynced ? c.session.synced : c.session.pressSync}</strong>
                   <p>{sessionSynced ? c.session.syncedText : c.session.localText}</p>
                 </div>
@@ -689,33 +723,6 @@ export default function Home() {
       </section>
 
       <div className="section-transition transition-blue-light" aria-hidden="true"><span /></div>
-
-      <section className="story-section" id="story">
-        <div className="story-shell">
-          <div className="story-visual" aria-hidden="true">
-            <div className="story-origin"><i /> {c.story.origin}</div>
-            <div className="big-quote">“</div>
-            <p>{c.story.quote}</p>
-            <div className="story-rhythm">
-              <span>{c.story.rhythm[0]}</span><i>→</i><span>{c.story.rhythm[1]}</span><i>→</i><span>{c.story.rhythm[2]}</span>
-            </div>
-            <div className="paper-note note-one">{c.story.feel}<br /><strong>{c.story.calm}</strong></div>
-            <div className="paper-note note-two">{c.story.feel}<br /><strong>{c.story.proud}</strong></div>
-          </div>
-          <div className="story-copy">
-            <h2>{c.story.title}</h2>
-            <p>{c.story.p1}</p>
-            <p>{c.story.p2}</p>
-            <div className="story-proof" aria-label={c.a11y.principles}>
-              <div><strong>{c.story.student}</strong><span>{c.story.studentText}</span></div>
-              <div><strong>{c.story.human}</strong><span>{c.story.humanText}</span></div>
-            </div>
-            <a className="text-link" href="#team">{c.story.link}</a>
-          </div>
-        </div>
-      </section>
-
-      <div className="section-transition transition-light-paper" aria-hidden="true"><span /></div>
 
       <section className="product-section" id="emotion-sync">
         <div className="product-copy">
