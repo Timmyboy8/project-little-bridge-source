@@ -3536,3 +3536,8 @@ body.auth-modal-open { overflow: hidden; }
   .story-chapter p { font-size: 15px; line-height: 1.85; }
   .story-team-link { margin-left: 42px; font-size: 14px; }
 }
+
+/* Upcoming locations retain a dashed boundary when selected. */
+.map-province.is-pending {fill:#d5c5e5;stroke:#84699a;stroke-dasharray:3 2}
+.map-legend .pending-key i {background:#d5c5e5;border:1px dashed #84699a}
+.pending-delivery {display:inline-block;align-self:flex-start;margin-bottom:8px;padding:4px 10px;border-radius:999px;background:#efe8f6;color:#5b386e;font-size:13px;font-weight:700}
